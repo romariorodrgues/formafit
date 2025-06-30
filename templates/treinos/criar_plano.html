@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Criar Plano de Treino - FormaFit{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'treinos:planos' %}" class="mr-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Criar Plano de Treino</h1>
+                <p class="mt-2 text-gray-600">Crie um novo plano de treino personalizado</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white shadow rounded-lg">
+        <form method="post" class="space-y-6 p-6">
+            {% csrf_token %}
+            
+            <!-- Informações Básicas -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Informações Básicas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.nome.id_for_label }}" class="block text-sm font-medium text-gray-700">Nome do Plano *</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.nome.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.aluno.id_for_label }}" class="block text-sm font-medium text-gray-700">Aluno *</label>
+                        {{ form.aluno }}
+                        {% if form.aluno.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.aluno.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="{{ form.descricao.id_for_label }}" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        {{ form.descricao }}
+                        {% if form.descricao.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.descricao.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.duracao_semanas.id_for_label }}" class="block text-sm font-medium text-gray-700">Duração (semanas)</label>
+                        {{ form.duracao_semanas }}
+                        {% if form.duracao_semanas.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.duracao_semanas.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">Observações</label>
+                        {{ form.observacoes }}
+                        {% if form.observacoes.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Erros gerais do formulário -->
+            {% if form.non_field_errors %}
+                <div class="rounded-md bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Informações sobre próximos passos -->
+            <div class="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-blue-800">
+                            Próximos passos
+                        </h3>
+                        <div class="mt-2 text-sm text-blue-700">
+                            <p>Após criar o plano, você poderá:</p>
+                            <ul class="list-disc pl-5 mt-1">
+                                <li>Adicionar dias de treino específicos</li>
+                                <li>Definir exercícios, séries e repetições</li>
+                                <li>Ativar o plano para o aluno</li>
+                                <li>Acompanhar o progresso dos treinos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex justify-end space-x-3">
+                <a href="{% url 'treinos:planos' %}" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Criar Plano
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

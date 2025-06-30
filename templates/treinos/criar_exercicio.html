@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Criar Exercício - FormaFit{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Criar Novo Exercício</h1>
+                    <p class="text-sm text-gray-600 mt-1">Adicione um novo exercício ao catálogo</p>
+                </div>
+                <a href="{% url 'treinos:exercicios' %}" 
+                   class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="px-6 py-6">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Nome do Exercício -->
+                <div>
+                    <label for="{{ form.nome.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Nome do Exercício <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.nome }}
+                    </div>
+                    {% if form.nome.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.nome.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Descrição -->
+                <div>
+                    <label for="{{ form.descricao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Descrição
+                    </label>
+                    <div class="mt-1">
+                        {{ form.descricao }}
+                    </div>
+                    {% if form.descricao.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.descricao.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Descrição breve do exercício</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Grupo Muscular -->
+                    <div>
+                        <label for="{{ form.grupo_muscular.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Grupo Muscular <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1">
+                            {{ form.grupo_muscular }}
+                        </div>
+                        {% if form.grupo_muscular.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.grupo_muscular.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Categoria -->
+                    <div>
+                        <label for="{{ form.categoria.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Categoria <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1">
+                            {{ form.categoria }}
+                        </div>
+                        {% if form.categoria.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.categoria.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Equipamento -->
+                    <div>
+                        <label for="{{ form.equipamento.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Equipamento <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1">
+                            {{ form.equipamento }}
+                        </div>
+                        {% if form.equipamento.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.equipamento.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Instruções -->
+                <div>
+                    <label for="{{ form.instrucoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Instruções de Execução
+                    </label>
+                    <div class="mt-1">
+                        {{ form.instrucoes }}
+                    </div>
+                    {% if form.instrucoes.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.instrucoes.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Instruções detalhadas sobre como executar o exercício corretamente</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- URL do Vídeo -->
+                    <div>
+                        <label for="{{ form.video_url.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            URL do Vídeo
+                        </label>
+                        <div class="mt-1">
+                            {{ form.video_url }}
+                        </div>
+                        {% if form.video_url.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.video_url.errors }}
+                            </div>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">Link para vídeo demonstrativo (YouTube, Vimeo, etc.)</p>
+                    </div>
+
+                    <!-- Imagem -->
+                    <div>
+                        <label for="{{ form.imagem.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Imagem Demonstrativa
+                        </label>
+                        <div class="mt-1">
+                            {{ form.imagem }}
+                        </div>
+                        {% if form.imagem.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.imagem.errors }}
+                            </div>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">Imagem demonstrativa do exercício</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-8">
+                <a href="{% url 'treinos:exercicios' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Criar Exercício
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

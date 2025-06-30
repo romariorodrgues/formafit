@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Adicionar Exercício - FormaFit{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Adicionar Exercício</h1>
+                    <p class="text-sm text-gray-600 mt-1">{{ treino.get_dia_semana_display }} - {{ treino.nome }}</p>
+                    <p class="text-xs text-gray-500">{{ treino.plano_treino.aluno.nome }}</p>
+                </div>
+                <a href="{% url 'treinos:detalhes_plano' treino.plano_treino.id %}" 
+                   class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <form method="post" class="px-6 py-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Exercício -->
+                <div class="md:col-span-2">
+                    <label for="{{ form.exercicio.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Exercício <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.exercicio }}
+                    </div>
+                    {% if form.exercicio.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.exercicio.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Ordem -->
+                <div>
+                    <label for="{{ form.ordem.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Ordem <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.ordem }}
+                    </div>
+                    {% if form.ordem.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.ordem.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Ordem de execução no treino</p>
+                </div>
+
+                <!-- Séries -->
+                <div>
+                    <label for="{{ form.series.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Séries <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.series }}
+                    </div>
+                    {% if form.series.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.series.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Repetições -->
+                <div>
+                    <label for="{{ form.repeticoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Repetições <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.repeticoes }}
+                    </div>
+                    {% if form.repeticoes.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.repeticoes.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Ex: 12-15, até a falha, 30 seg</p>
+                </div>
+
+                <!-- Carga -->
+                <div>
+                    <label for="{{ form.carga.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Carga
+                    </label>
+                    <div class="mt-1">
+                        {{ form.carga }}
+                    </div>
+                    {% if form.carga.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.carga.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Ex: 20kg, peso corporal</p>
+                </div>
+
+                <!-- Tempo de Descanso -->
+                <div>
+                    <label for="{{ form.tempo_descanso.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Tempo de Descanso
+                    </label>
+                    <div class="mt-1">
+                        {{ form.tempo_descanso }}
+                    </div>
+                    {% if form.tempo_descanso.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.tempo_descanso.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Tempo entre séries</p>
+                </div>
+
+                <!-- Observações -->
+                <div class="md:col-span-2">
+                    <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Observações
+                    </label>
+                    <div class="mt-1">
+                        {{ form.observacoes }}
+                    </div>
+                    {% if form.observacoes.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.observacoes.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Técnicas especiais, ajustes ou cuidados específicos</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                <a href="{% url 'treinos:detalhes_plano' treino.plano_treino.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Adicionar Exercício
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de exercícios existentes no treino -->
+    {% if treino.exercicios.exists %}
+        <div class="mt-6 bg-white shadow-sm rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Exercícios Atuais</h3>
+            </div>
+            <div class="px-6 py-4">
+                <div class="space-y-3">
+                    {% for exercicio_treino in treino.exercicios.all %}
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <span class="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-800 text-sm font-medium rounded-full mr-3">
+                                    {{ exercicio_treino.ordem }}
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">{{ exercicio_treino.exercicio.nome }}</h4>
+                                    <div class="text-xs text-gray-600 mt-1 space-x-4">
+                                        <span>{{ exercicio_treino.series }} séries</span>
+                                        <span>{{ exercicio_treino.repeticoes }} rep</span>
+                                        {% if exercicio_treino.carga %}
+                                            <span>{{ exercicio_treino.carga }}</span>
+                                        {% endif %}
+                                        {% if exercicio_treino.tempo_descanso %}
+                                            <span>Desc: {{ exercicio_treino.tempo_descanso }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {{ exercicio_treino.exercicio.get_grupo_muscular_display }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-calcular próxima ordem
+document.addEventListener('DOMContentLoaded', function() {
+    const ordemField = document.getElementById('{{ form.ordem.id_for_label }}');
+    if (ordemField && !ordemField.value) {
+        const exerciciosExistentes = {{ treino.exercicios.count|default:0 }};
+        ordemField.value = exerciciosExistentes + 1;
+    }
+});
+</script>
+{% endblock %}

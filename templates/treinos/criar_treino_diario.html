@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Adicionar Dia de Treino - FormaFit{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Adicionar Dia de Treino</h1>
+                    <p class="text-sm text-gray-600 mt-1">{{ plano.nome }} - {{ plano.aluno.nome }}</p>
+                </div>
+                <a href="{% url 'treinos:detalhes_plano' plano.id %}" 
+                   class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <form method="post" class="px-6 py-6 space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.dia_semana.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Dia da Semana
+                </label>
+                <div class="mt-1">
+                    {{ form.dia_semana }}
+                </div>
+                {% if form.dia_semana.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.dia_semana.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.nome.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Nome do Treino <span class="text-red-500">*</span>
+                </label>
+                <div class="mt-1">
+                    {{ form.nome }}
+                </div>
+                {% if form.nome.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.nome.errors }}
+                    </div>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500">Ex: Treino A - Superiores, Peito e Tríceps</p>
+            </div>
+
+            <div>
+                <label for="{{ form.descricao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Descrição
+                </label>
+                <div class="mt-1">
+                    {{ form.descricao }}
+                </div>
+                {% if form.descricao.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.descricao.errors }}
+                    </div>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500">Descrição detalhada do treino e seus objetivos</p>
+            </div>
+
+            <div>
+                <label for="{{ form.tempo_estimado.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Tempo Estimado (minutos)
+                </label>
+                <div class="mt-1">
+                    {{ form.tempo_estimado }}
+                </div>
+                {% if form.tempo_estimado.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.tempo_estimado.errors }}
+                    </div>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500">Duração estimada para completar o treino</p>
+            </div>
+
+            <div>
+                <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Observações
+                </label>
+                <div class="mt-1">
+                    {{ form.observacoes }}
+                </div>
+                {% if form.observacoes.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.observacoes.errors }}
+                    </div>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500">Orientações específicas, cuidados ou dicas para este dia</p>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'treinos:detalhes_plano' plano.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Adicionar Dia
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agenda de Aulas - FormaFit{% endblock %}
+
+{% block page_title %}Agenda de Aulas{% endblock %}
+{% block page_subtitle %}Gerencie os agendamentos e horários das aulas dos seus alunos{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Filtros -->
+    <div class="mb-6">
+        <div class="bg-white rounded-lg shadow p-4">
+            <form method="get" class="flex flex-wrap items-end gap-4">
+                <div class="flex-1 min-w-48">
+                    <label for="data" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                    <input type="date" name="data" id="data" value="{{ request.GET.data }}"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                
+                <div class="flex-1 min-w-48">
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" id="status"
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Todos os status</option>
+                        <option value="agendada" {% if request.GET.status == 'agendada' %}selected{% endif %}>Agendada</option>
+                        <option value="confirmada" {% if request.GET.status == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                        <option value="cancelada" {% if request.GET.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                        <option value="realizada" {% if request.GET.status == 'realizada' %}selected{% endif %}>Realizada</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-search mr-2"></i>Filtrar
+                    </button>
+                    <a href="{% url 'frequencia:agenda' %}" 
+                       class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-times mr-2"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="mb-6 flex justify-between items-center">
+        <div class="flex gap-3">
+            <a href="{% url 'frequencia:agendar_aula' %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-plus mr-2"></i>Nova Aula
+            </a>
+            <a href="{% url 'frequencia:calendario' %}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-calendar-alt mr-2"></i>Calendário
+            </a>
+        </div>
+    </div>
+
+    <!-- Lista de Agendamentos -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        {% if agendamentos %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aluno
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Data
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Horário
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tipo de Treino
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for agendamento in agendamentos %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        {% if agendamento.aluno.foto_perfil %}
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ agendamento.aluno.foto_perfil.url }}" alt="">
+                                        {% else %}
+                                            <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                                <span class="text-sm font-medium text-white">{{ agendamento.aluno.nome|first }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ agendamento.aluno.nome }}</div>
+                                        <div class="text-sm text-gray-500">{{ agendamento.aluno.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ agendamento.data_aula|date:"d/m/Y" }}
+                                <div class="text-xs text-gray-500">{{ agendamento.data_aula|date:"l" }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ agendamento.horario_inicio|time:"H:i" }} - {{ agendamento.horario_fim|time:"H:i" }}
+                                <div class="text-xs text-gray-500">{{ agendamento.duracao_minutos }} min</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ agendamento.tipo_treino|default:"Não especificado" }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if agendamento.status == 'agendada' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-clock mr-1"></i>Agendada
+                                    </span>
+                                {% elif agendamento.status == 'confirmada' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fas fa-check mr-1"></i>Confirmada
+                                    </span>
+                                {% elif agendamento.status == 'cancelada' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <i class="fas fa-times mr-1"></i>Cancelada
+                                    </span>
+                                {% elif agendamento.status == 'realizada' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>Realizada
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <div class="flex items-center space-x-2">
+                                    <a href="{% url 'frequencia:alterar_status' agendamento.id %}" 
+                                       class="text-blue-600 hover:text-blue-900 transition-colors"
+                                       title="Alterar Status">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    
+                                    {% if agendamento.status == 'agendada' or agendamento.status == 'confirmada' %}
+                                    <button onclick="confirmarPresenca({{ agendamento.id }})"
+                                            class="text-green-600 hover:text-green-900 transition-colors"
+                                            title="Confirmar Presença">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}
+                                    
+                                    <button onclick="cancelarAula({{ agendamento.id }})"
+                                            class="text-red-600 hover:text-red-900 transition-colors"
+                                            title="Cancelar Aula">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            {% if is_paginated %}
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-700">
+                            Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} agendamentos
+                        </div>
+                        <div class="flex space-x-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}" 
+                                   class="bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 px-3 py-2 rounded-md text-sm font-medium">
+                                    Anterior
+                                </a>
+                            {% endif %}
+                            
+                            <span class="bg-blue-50 border border-blue-200 text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                {{ page_obj.number }}
+                            </span>
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" 
+                                   class="bg-white border border-gray-300 text-gray-500 hover:bg-gray-50 px-3 py-2 rounded-md text-sm font-medium">
+                                    Próximo
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Estado vazio -->
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m-16-4h.01M16 30h.01" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum agendamento encontrado</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    Comece agendando uma nova aula para seus alunos.
+                </p>
+                <div class="mt-6">
+                    <a href="{% url 'frequencia:agendar_aula' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2"></i>Agendar Primeira Aula
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function confirmarPresenca(agendamentoId) {
+    if (confirm('Deseja confirmar a presença para esta aula?')) {
+        // Implementar lógica de confirmação de presença
+        fetch(`/frequencia/agenda/${agendamentoId}/status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({status: 'realizada'})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao confirmar presença: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao processar solicitação');
+        });
+    }
+}
+
+function cancelarAula(agendamentoId) {
+    if (confirm('Deseja cancelar esta aula?')) {
+        fetch(`/frequencia/agenda/${agendamentoId}/status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({status: 'cancelada'})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao cancelar aula: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao processar solicitação');
+        });
+    }
+}
+</script>
+{% endblock %}

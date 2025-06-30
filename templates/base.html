@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FormaFit - Sistema para Personal Trainers{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Gradiente personalizado inspirado nas imagens */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+        }
+        
+        /* Garantir rolagem adequada */
+        html, body {
+            height: auto;
+            overflow-x: hidden;
+        }
+        
+        .main-content {
+            max-height: none;
+            overflow-y: visible;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Loading Screen -->
+    <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center" style="display: none;">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-gray-600">Carregando...</p>
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+        <!-- Sidebar Navigation -->
+        <div class="flex min-h-screen bg-gray-50">
+            <!-- Sidebar -->
+            <div class="sidebar-gradient w-64 shadow-lg min-h-screen" x-data="{ open: true }">
+                <!-- Logo -->
+                <div class="p-6 border-b border-blue-700">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white rounded-lg p-2">
+                            <i class="fas fa-dumbbell text-blue-600 text-xl"></i>
+                        </div>
+                        <h2 class="text-white text-xl font-bold">FormaFit</h2>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="mt-6">
+                    <div class="px-6 mb-6">
+                        <div class="flex items-center space-x-3 p-3 rounded-lg bg-blue-700">
+                            {% if user.foto_perfil %}
+                                <img src="{{ user.foto_perfil.url }}" alt="Perfil" class="w-8 h-8 rounded-full">
+                            {% else %}
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-sm"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <p class="text-white text-sm font-medium">{{ user.nome_completo }}</p>
+                                <p class="text-blue-200 text-xs">Personal Trainer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-2 px-4">
+                        <li>
+                            <a href="{% url 'accounts:dashboard' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors {% if request.resolver_match.url_name == 'dashboard' %}bg-blue-700{% endif %}">
+                                <i class="fas fa-home"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'alunos:lista' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors {% if 'alunos' in request.resolver_match.url_name %}bg-blue-700{% endif %}">
+                                <i class="fas fa-users"></i>
+                                <span>Alunos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'treinos:planos' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors {% if 'treinos' in request.resolver_match.url_name %}bg-blue-700{% endif %}">
+                                <i class="fas fa-dumbbell"></i>
+                                <span>Treinos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'frequencia:agenda' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors {% if 'frequencia' in request.resolver_match.url_name %}bg-blue-700{% endif %}">
+                                <i class="fas fa-calendar"></i>
+                                <span>Frequência</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'financeiro:dashboard' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors {% if 'financeiro' in request.resolver_match.url_name %}bg-blue-700{% endif %}">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Financeiro</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'relatorios:lista' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors {% if 'relatorios' in request.resolver_match.url_name %}bg-blue-700{% endif %}">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Relatórios</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors opacity-50 cursor-not-allowed">
+                                <i class="fas fa-bell"></i>
+                                <span>Notificações</span>
+                                <span class="text-xs bg-yellow-500 px-2 py-1 rounded ml-auto">Em breve</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <hr class="my-6 border-blue-700">
+
+                    <ul class="space-y-2 px-4">
+                        <li>
+                            <a href="{% url 'accounts:perfil' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accounts:configuracoes' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-cog"></i>
+                                <span>Configurações</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accounts:logout' %}" 
+                               class="flex items-center space-x-3 text-white p-3 rounded-lg hover:bg-red-600 transition-colors">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col">
+                <!-- Top Header -->
+                <header class="bg-white shadow-sm border-b border-gray-200">
+                    <div class="flex items-center justify-between px-6 py-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">
+                                {% block page_title %}Dashboard{% endblock %}
+                            </h1>
+                            <p class="text-gray-600">
+                                {% block page_subtitle %}Bem-vindo ao seu painel de controle{% endblock %}
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <!-- Quick Actions -->
+                            <div class="flex space-x-2">
+                                {% block quick_actions %}
+                                    <a href="{% url 'alunos:cadastrar' %}" 
+                                       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-plus mr-2"></i>Novo Aluno
+                                    </a>
+                                {% endblock %}
+                            </div>
+                            
+                            <!-- Notifications -->
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open" 
+                                        class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                                    <i class="fas fa-bell text-xl"></i>
+                                    {% if notificacoes_nao_lidas > 0 %}
+                                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                            {{ notificacoes_nao_lidas }}
+                                        </span>
+                                    {% endif %}
+                                </button>
+                                
+                                <!-- Dropdown -->
+                                <div x-show="open" 
+                                     @click.away="open = false"
+                                     class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                    <!-- Notification items would go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Page Content -->
+                <main class="flex-1 p-6 main-content">
+                    <!-- Messages -->
+                    {% if messages %}
+                        <div class="mb-6">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} p-4 mb-4 rounded-lg border {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% block content %}{% endblock %}
+                </main>
+            </div>
+        </div>
+    {% else %}
+        <!-- Non-authenticated layout -->
+        <div class="min-h-screen gradient-bg flex items-center justify-center">
+            {% block unauthenticated_content %}
+                <div class="max-w-md w-full space-y-8">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-white">FormaFit</h2>
+                        <p class="mt-2 text-blue-100">Sistema para Personal Trainers</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-xl p-8">
+                        {% block form_content %}{% endblock %}
+                    </div>
+                </div>
+            {% endblock %}
+        </div>
+    {% endif %}
+
+    <!-- Scripts -->
+    <script>
+        // Função para mostrar loading
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        // Função para esconder loading
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Auto-hide alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 300);
+            });
+        }, 5000);
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registrar Presença - FormaFit{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow-sm rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Registrar Presença</h1>
+                    <p class="text-sm text-gray-600 mt-1">Marque a presença ou falta de um aluno</p>
+                </div>
+                <a href="{% url 'frequencia:lista' %}" 
+                   class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <form method="post" class="px-6 py-6 space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.aluno.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Aluno <span class="text-red-500">*</span>
+                </label>
+                <div class="mt-1">
+                    {{ form.aluno }}
+                </div>
+                {% if form.aluno.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.aluno.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.data_aula.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Data da Aula <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.data_aula }}
+                    </div>
+                    {% if form.data_aula.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.data_aula.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.status }}
+                    </div>
+                    {% if form.status.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.status.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.horario_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Horário de Início <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.horario_inicio }}
+                    </div>
+                    {% if form.horario_inicio.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.horario_inicio.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.horario_fim.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Horário de Fim
+                    </label>
+                    <div class="mt-1">
+                        {{ form.horario_fim }}
+                    </div>
+                    {% if form.horario_fim.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.horario_fim.errors }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">Opcional - para calcular duração da aula</p>
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Observações
+                </label>
+                <div class="mt-1">
+                    {{ form.observacoes }}
+                </div>
+                {% if form.observacoes.errors %}
+                    <div class="mt-1 text-sm text-red-600">
+                        {{ form.observacoes.errors }}
+                    </div>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500">Anotações sobre a aula, motivo da falta, etc.</p>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'frequencia:lista' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Registrar Presença
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Dicas -->
+    <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Dicas para registro de presença</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Use "Presente" para aulas realizadas normalmente</li>
+                        <li>Use "Falta" para ausências não justificadas</li>
+                        <li>Use "Falta Justificada" para ausências com motivo válido</li>
+                        <li>Use "Cancelado" para aulas canceladas pelo personal trainer</li>
+                        <li>Preencha o horário de fim para calcular a duração da aula</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Definir data de hoje como padrão
+document.addEventListener('DOMContentLoaded', function() {
+    const dataField = document.getElementById('{{ form.data_aula.id_for_label }}');
+    if (dataField && !dataField.value) {
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        dataField.value = `${ano}-${mes}-${dia}`;
+    }
+    
+    // Definir horário atual como padrão
+    const horarioField = document.getElementById('{{ form.horario_inicio.id_for_label }}');
+    if (horarioField && !horarioField.value) {
+        const agora = new Date();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        horarioField.value = `${horas}:${minutos}`;
+    }
+});
+</script>
+{% endblock %}

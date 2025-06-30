@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ plano.nome }} - FormaFit{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header do Plano -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ plano.nome }}</h1>
+                    <p class="text-gray-600 mt-1">{{ plano.aluno.nome }}</p>
+                    <div class="flex items-center mt-2 space-x-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if plano.ativo %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {% if plano.ativo %}Ativo{% else %}Inativo{% endif %}
+                        </span>
+                        <span class="text-sm text-gray-500">{{ plano.duracao_semanas }} semanas</span>
+                        <span class="text-sm text-gray-500">Criado em {{ plano.data_criacao|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="ativarPlano({{ plano.id }})" 
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {% if plano.ativo %}
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Desativar
+                        {% else %}
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1M3 7h18M3 11h18M3 15h18M3 19h18"></path>
+                            </svg>
+                            Ativar
+                        {% endif %}
+                    </button>
+                    
+                    <a href="{% url 'treinos:copiar_plano' plano.id %}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Copiar
+                    </a>
+                    
+                    <a href="{% url 'treinos:criar_treino_diario' plano.id %}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Adicionar Dia
+                    </a>
+                </div>
+            </div>
+            
+            {% if plano.descricao %}
+                <div class="mt-4">
+                    <p class="text-gray-700">{{ plano.descricao }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Dias da Semana -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% for dia in dias_treino %}
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">{{ dia.get_dia_semana_display }}</h3>
+                            <p class="text-sm text-gray-600">{{ dia.nome }}</p>
+                            {% if dia.tempo_estimado %}
+                                <p class="text-xs text-gray-500 mt-1">{{ dia.tempo_estimado }} min</p>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'treinos:adicionar_exercicio' dia.id %}" 
+                           class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Exercício
+                        </a>
+                    </div>
+                    
+                    {% if dia.descricao %}
+                        <p class="text-sm text-gray-600 mt-2">{{ dia.descricao }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="px-6 py-4">
+                    {% if dia.exercicios.exists %}
+                        <div class="space-y-3">
+                            {% for exercicio_treino in dia.exercicios.all %}
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex-1">
+                                        <div class="flex items-center">
+                                            <span class="inline-flex items-center justify-center w-6 h-6 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full mr-3">
+                                                {{ exercicio_treino.ordem }}
+                                            </span>
+                                            <div>
+                                                <h4 class="text-sm font-medium text-gray-900">{{ exercicio_treino.exercicio.nome }}</h4>
+                                                <div class="text-xs text-gray-600 mt-1 space-x-4">
+                                                    <span>{{ exercicio_treino.series }} séries</span>
+                                                    <span>{{ exercicio_treino.repeticoes }} rep</span>
+                                                    {% if exercicio_treino.carga %}
+                                                        <span>{{ exercicio_treino.carga }}</span>
+                                                    {% endif %}
+                                                    {% if exercicio_treino.tempo_descanso %}
+                                                        <span>Desc: {{ exercicio_treino.tempo_descanso }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% if exercicio_treino.observacoes %}
+                                                    <p class="text-xs text-gray-500 mt-1">{{ exercicio_treino.observacoes }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ exercicio_treino.exercicio.get_grupo_muscular_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-6">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-500">Nenhum exercício adicionado</p>
+                            <a href="{% url 'treinos:adicionar_exercicio' dia.id %}" 
+                               class="mt-2 inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900">
+                                Adicionar primeiro exercício
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if dia.observacoes %}
+                    <div class="px-6 py-3 bg-yellow-50 border-t border-gray-200">
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm text-yellow-800">{{ dia.observacoes }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="col-span-2">
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V11a2 2 0 012-2h2m8 0h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2V11a2 2 0 012-2z"></path>
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">Nenhum dia de treino criado</h3>
+                    <p class="mt-2 text-sm text-gray-500">Comece adicionando os dias da semana em que o aluno irá treinar.</p>
+                    <div class="mt-6">
+                        <a href="{% url 'treinos:criar_treino_diario' plano.id %}" 
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Adicionar primeiro dia
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if plano.observacoes %}
+        <div class="mt-6 bg-white shadow rounded-lg">
+            <div class="px-6 py-4">
+                <h3 class="text-lg font-medium text-gray-900 mb-3">Observações Gerais</h3>
+                <p class="text-gray-700">{{ plano.observacoes }}</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function ativarPlano(planoId) {
+    fetch(`/treinos/${planoId}/ativar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao alterar status do plano');
+    });
+}
+</script>
+{% endblock %}

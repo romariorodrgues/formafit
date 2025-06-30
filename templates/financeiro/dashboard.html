@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Financeiro - FormaFit{% endblock %}
+
+{% block page_title %}Dashboard Financeiro{% endblock %}
+{% block page_subtitle %}Gerencie as finanças dos seus alunos e acompanhe receitas{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Cards de Estatísticas Financeiras -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Receita do Mês -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Receita do Mês</dt>
+                            <dd class="text-lg font-medium text-gray-900">R$ {{ receita_mes|default:"0,00" }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faturas Pendentes -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-clock text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Faturas Pendentes</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ faturas_pendentes|default:0 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faturas Vencidas -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Faturas Vencidas</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ faturas_vencidas|default:0 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total de Contratos -->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-file-contract text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Contratos Ativos</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ contratos_ativos|default:0 }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de Ação Rápida -->
+    <div class="mb-8 flex flex-wrap gap-4">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed">
+            <i class="fas fa-plus mr-2"></i>Nova Fatura
+            <span class="ml-2 text-xs bg-blue-500 px-2 py-1 rounded">Em breve</span>
+        </button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed">
+            <i class="fas fa-file-contract mr-2"></i>Novo Contrato
+            <span class="ml-2 text-xs bg-green-500 px-2 py-1 rounded">Em breve</span>
+        </button>
+        <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed">
+            <i class="fas fa-chart-bar mr-2"></i>Relatório Financeiro
+            <span class="ml-2 text-xs bg-purple-500 px-2 py-1 rounded">Em breve</span>
+        </button>
+    </div>
+
+    <!-- Seções Principais -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Faturas Recentes -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Faturas Recentes</h3>
+            </div>
+            <div class="p-6">
+                {% if faturas_recentes %}
+                    <div class="space-y-4">
+                        {% for fatura in faturas_recentes %}
+                        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-white">{{ fatura.aluno.nome|first }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ fatura.aluno.nome }}</p>
+                                    <p class="text-sm text-gray-500">Venc: {{ fatura.data_vencimento|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">R$ {{ fatura.valor }}</p>
+                                {% if fatura.status == 'pendente' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Pendente
+                                    </span>
+                                {% elif fatura.status == 'pago' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Pago
+                                    </span>
+                                {% elif fatura.status == 'vencido' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        Vencido
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M34 40h10v-4a6 6 0 00-10.712-3.714M34 40H14m20 0v-4a9.971 9.971 0 00-.712-3.714M14 40H4v-4a6 6 0 0110.713-3.714M14 40v-4c0-1.313.253-2.566.713-3.714m0 0A10.003 10.003 0 0124 26c4.21 0 7.813 2.602 9.288 6.286" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhuma fatura encontrada</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Comece criando contratos para seus alunos.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Gráfico de Receitas (Placeholder) -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Receitas dos Últimos 6 Meses</h3>
+            </div>
+            <div class="p-6">
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M9 17v-2a2 2 0 012-2h6m0 0V9a2 2 0 112 0v4h6a2 2 0 012 2v2M9 17l4 4 4-4m6 0l4 4 4-4m-6-8v4m0 0h6m-6 0H9m12 0v8m0 0H9m12 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Gráfico em Desenvolvimento</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Visualização de receitas estará disponível em breve.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Funcionalidades em Desenvolvimento -->
+    <div class="mt-8">
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">
+                        Funcionalidades do Módulo Financeiro
+                    </h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Gestão completa de contratos de alunos</li>
+                            <li>Geração automática de faturas mensais</li>
+                            <li>Controle de pagamentos e inadimplência</li>
+                            <li>Relatórios financeiros detalhados</li>
+                            <li>Integração com sistemas de pagamento</li>
+                            <li>Notificações automáticas de vencimento</li>
+                        </ul>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex">
+                            <a href="{% url 'accounts:dashboard' %}" 
+                               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                Voltar ao Dashboard Principal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

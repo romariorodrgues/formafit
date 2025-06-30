@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastrar Aluno - FormaFit{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center">
+            <a href="{% url 'alunos:lista' %}" class="mr-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Cadastrar Novo Aluno</h1>
+                <p class="mt-2 text-gray-600">Preencha as informações básicas do aluno</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white shadow rounded-lg">
+        <form method="post" class="space-y-6 p-6">
+            {% csrf_token %}
+            
+            <!-- Dados Pessoais -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Dados Pessoais</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.nome.id_for_label }}" class="block text-sm font-medium text-gray-700">Nome Completo *</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.nome.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.telefone.id_for_label }}" class="block text-sm font-medium text-gray-700">Telefone *</label>
+                        {{ form.telefone }}
+                        {% if form.telefone.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.telefone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.data_nascimento.id_for_label }}" class="block text-sm font-medium text-gray-700">Data de Nascimento *</label>
+                        {{ form.data_nascimento }}
+                        {% if form.data_nascimento.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.data_nascimento.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.sexo.id_for_label }}" class="block text-sm font-medium text-gray-700">Sexo *</label>
+                        {{ form.sexo }}
+                        {% if form.sexo.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.sexo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados Físicos -->
+            <div class="pt-6 border-t border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Dados Físicos</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="{{ form.altura.id_for_label }}" class="block text-sm font-medium text-gray-700">Altura (m) *</label>
+                        {{ form.altura }}
+                        {% if form.altura.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.altura.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.peso_inicial.id_for_label }}" class="block text-sm font-medium text-gray-700">Peso Inicial (kg) *</label>
+                        {{ form.peso_inicial }}
+                        {% if form.peso_inicial.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.peso_inicial.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.endereco.id_for_label }}" class="block text-sm font-medium text-gray-700">Endereço</label>
+                        {{ form.endereco }}
+                        {% if form.endereco.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.endereco.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.peso_inicial.id_for_label }}" class="block text-sm font-medium text-gray-700">Peso Inicial (kg) *</label>
+                        {{ form.peso_inicial }}
+                        {% if form.peso_inicial.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.peso_inicial.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objetivos e Observações -->
+            <div class="pt-6 border-t border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Objetivos e Observações</h3>
+                <div class="space-y-6">
+                    <div>
+                        <label for="{{ form.objetivo.id_for_label }}" class="block text-sm font-medium text-gray-700">Objetivos *</label>
+                        {{ form.objetivo }}
+                        {% if form.objetivo.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.objetivo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">Observações Gerais</label>
+                        {{ form.observacoes }}
+                        {% if form.observacoes.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="pt-6 border-t border-gray-200">
+                <div class="flex items-center">
+                    {{ form.ativo }}
+                    <label for="{{ form.ativo.id_for_label }}" class="ml-2 block text-sm text-gray-900">
+                        Aluno ativo (marque para ativar imediatamente)
+                    </label>
+                </div>
+                {% if form.ativo.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.ativo.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Erros gerais do formulário -->
+            {% if form.non_field_errors %}
+                <div class="rounded-md bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Botões -->
+            <div class="pt-6 border-t border-gray-200 flex justify-end space-x-3">
+                <a href="{% url 'alunos:lista' %}" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cadastrar Aluno
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Máscara para telefone
+document.addEventListener('DOMContentLoaded', function() {
+    const telefoneInput = document.getElementById('{{ form.telefone.id_for_label }}');
+    
+    if (telefoneInput) {
+        telefoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length <= 11) {
+                value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+            }
+            
+            e.target.value = value;
+        });
+    }
+    
+    // Auto-calcular IMC quando peso e altura forem preenchidos
+    const pesoInput = document.getElementById('{{ form.peso_inicial.id_for_label }}');
+    const alturaInput = document.getElementById('{{ form.altura.id_for_label }}');
+    
+    function calcularIMC() {
+        const peso = parseFloat(pesoInput.value);
+        const altura = parseFloat(alturaInput.value);
+        
+        if (peso && altura) {
+            const imc = peso / (altura * altura);
+            console.log('IMC calculado:', imc.toFixed(1));
+        }
+    }
+    
+    if (pesoInput && alturaInput) {
+        pesoInput.addEventListener('blur', calcularIMC);
+        alturaInput.addEventListener('blur', calcularIMC);
+    }
+});
+</script>
+{% endblock %}
