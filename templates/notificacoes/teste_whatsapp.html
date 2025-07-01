@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Teste WhatsApp{% endblock %}
+
+{% block breadcrumb %}
+<nav class="text-sm font-medium text-gray-600 mb-6">
+    <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+            <a href="{% url 'accounts:dashboard' %}" class="hover:text-blue-600">Dashboard</a>
+            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9-379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.476 239.030c9.373 9.372 9.373 24.568 0 33.941z"/>
+            </svg>
+        </li>
+        <li class="flex items-center">
+            <a href="{% url 'notificacoes:lista' %}" class="hover:text-blue-600">Notificações</a>
+            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9-357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9-379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.476 239.030c9.373 9.372 9.373 24.568 0 33.941z"/>
+            </svg>
+        </li>
+        <li class="text-gray-500">Teste WhatsApp</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow mb-6 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    <i class="fab fa-whatsapp text-green-600 mr-2"></i>
+                    Teste de WhatsApp
+                </h1>
+                <p class="mt-1 text-sm text-gray-600">Envie uma mensagem de teste para verificar a integração com a API</p>
+            </div>
+            <a href="{% url 'notificacoes:configuracoes' %}" 
+               class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Formulário de Teste -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Número de Telefone -->
+                <div>
+                    <label for="telefone" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-phone text-blue-500 mr-2"></i>Número de Telefone *
+                    </label>
+                    <input type="tel" 
+                           id="telefone" 
+                           name="telefone" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                           placeholder="(11) 99999-9999"
+                           required>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Digite o número de telefone com DDD no formato (11) 99999-9999
+                    </p>
+                </div>
+
+                <!-- Mensagem -->
+                <div>
+                    <label for="mensagem" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-comment text-blue-500 mr-2"></i>Mensagem de Teste *
+                    </label>
+                    <textarea id="mensagem" 
+                              name="mensagem" 
+                              rows="4" 
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                              placeholder="Digite sua mensagem de teste..."
+                              required>🤖 Esta é uma mensagem de teste do sistema FormaFit!
+
+Se você recebeu esta mensagem, significa que a integração com WhatsApp está funcionando corretamente.
+
+Atenciosamente,
+Sistema FormaFit</textarea>
+                    <div class="flex justify-between items-center mt-1">
+                        <p class="text-xs text-gray-500">Máximo de 1000 caracteres</p>
+                        <span id="contador" class="text-xs text-gray-400">0/1000</span>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                    <a href="{% url 'notificacoes:configuracoes' %}" 
+                       class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                        <i class="fab fa-whatsapp mr-2"></i>Enviar Teste
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Informações sobre a API -->
+    <div class="mt-6 space-y-4">
+        <!-- Status da API -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Sobre o Teste</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Este teste usa a integração com a API ChatPro para envio de WhatsApp</li>
+                            <li>A mensagem será enviada para o número informado</li>
+                            <li>Use apenas para testes e verificações de funcionamento</li>
+                            <li>Verifique se o número possui WhatsApp ativo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dicas de Uso -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-lightbulb text-yellow-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">Dicas para Teste</h3>
+                    <div class="mt-2 text-sm text-yellow-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Use seu próprio número para testar</li>
+                            <li>Inclua emojis para ver como são tratados</li>
+                            <li>Teste quebras de linha e formatação</li>
+                            <li>Verifique se recebe a mensagem no WhatsApp</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links Úteis -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-800">Links Úteis</h3>
+                    <p class="text-xs text-gray-600 mt-1">Ferramentas para gerenciamento de WhatsApp</p>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{% url 'notificacoes:logs_whatsapp' %}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">
+                        <i class="fas fa-list mr-1"></i>Ver Logs
+                    </a>
+                    <a href="{% url 'notificacoes:configuracoes' %}" 
+                       class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-xs">
+                        <i class="fas fa-cog mr-1"></i>Configurações
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Contador de caracteres
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('mensagem');
+    const contador = document.getElementById('contador');
+    
+    function atualizarContador() {
+        const length = textarea.value.length;
+        contador.textContent = `${length}/1000`;
+        
+        if (length > 1000) {
+            contador.classList.add('text-red-500');
+            contador.classList.remove('text-gray-400');
+        } else {
+            contador.classList.remove('text-red-500');
+            contador.classList.add('text-gray-400');
+        }
+    }
+    
+    textarea.addEventListener('input', atualizarContador);
+    atualizarContador(); // Inicializar
+});
+
+// Formatação de telefone
+document.getElementById('telefone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.length <= 11) {
+        if (value.length <= 2) {
+            value = `(${value}`;
+        } else if (value.length <= 7) {
+            value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+        } else {
+            value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
+        }
+    }
+    
+    e.target.value = value;
+});
+</script>
+{% endblock %}

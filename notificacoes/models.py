@@ -13,8 +13,9 @@ class TipoNotificacao(models.Model):
     """
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
-    template_titulo = models.CharField(max_length=200, help_text="Template do título da notificação")
-    template_mensagem = models.TextField(help_text="Template da mensagem da notificação")
+    cor = models.CharField(max_length=7, default='#6B7280', help_text="Cor hexadecimal para identificação visual")
+    template_titulo = models.CharField(max_length=200, help_text="Template do título da notificação", blank=True)
+    template_mensagem = models.TextField(help_text="Template da mensagem da notificação", blank=True)
     ativo = models.BooleanField(default=True)
     
     # Configurações de envio

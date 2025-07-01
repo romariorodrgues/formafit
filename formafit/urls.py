@@ -23,7 +23,7 @@ urlpatterns = [
     path('frequencia/', include('frequencia.urls')),
     path('financeiro/', include('financeiro.urls')),
     path('relatorios/', include('relatorios.urls')),
-    # path('notificacoes/', include('notificacoes.urls')),
+    path('notificacoes/', include('notificacoes.urls')),
 ]
 
 # Servir arquivos estáticos e media em desenvolvimento

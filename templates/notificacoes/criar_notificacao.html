@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Notificação{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-8" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'notificacoes:lista' %}" class="text-blue-600 hover:text-blue-800">
+                    Notificações
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-1 text-gray-500 md:ml-2">Nova Notificação</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-semibold text-gray-900">Criar Nova Notificação</h1>
+        <p class="mt-2 text-sm text-gray-700">Envie notificações personalizadas para seus alunos</p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Dados da Notificação</h3>
+        </div>
+
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Tipo e Destinatário -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.tipo_notificacao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.tipo_notificacao.label }}
+                    </label>
+                    {{ form.tipo_notificacao }}
+                    {% if form.tipo_notificacao.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.tipo_notificacao.errors.0 }}</p>
+                    {% endif %}
+                    {% if form.tipo_notificacao.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.tipo_notificacao.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.aluno.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.aluno.label }}
+                    </label>
+                    {{ form.aluno }}
+                    {% if form.aluno.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.aluno.errors.0 }}</p>
+                    {% endif %}
+                    {% if form.aluno.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.aluno.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Título -->
+            <div>
+                <label for="{{ form.titulo.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ form.titulo.label }}
+                </label>
+                {{ form.titulo }}
+                {% if form.titulo.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.titulo.errors.0 }}</p>
+                {% endif %}
+                {% if form.titulo.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.titulo.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Mensagem -->
+            <div>
+                <label for="{{ form.mensagem.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ form.mensagem.label }}
+                </label>
+                {{ form.mensagem }}
+                {% if form.mensagem.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.mensagem.errors.0 }}</p>
+                {% endif %}
+                {% if form.mensagem.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ form.mensagem.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Prioridade e Agendamento -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.prioridade.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.prioridade.label }}
+                    </label>
+                    {{ form.prioridade }}
+                    {% if form.prioridade.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.prioridade.errors.0 }}</p>
+                    {% endif %}
+                    {% if form.prioridade.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.prioridade.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.data_agendamento.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.data_agendamento.label }}
+                    </label>
+                    {{ form.data_agendamento }}
+                    {% if form.data_agendamento.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.data_agendamento.errors.0 }}</p>
+                    {% endif %}
+                    {% if form.data_agendamento.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.data_agendamento.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Enviar Agora -->
+            <div class="flex items-center">
+                {{ form.enviar_agora }}
+                <label for="{{ form.enviar_agora.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                    {{ form.enviar_agora.label }}
+                </label>
+                {% if form.enviar_agora.help_text %}
+                    <p class="ml-2 text-sm text-gray-500">{{ form.enviar_agora.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Botões -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'notificacoes:lista' %}" 
+                   class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                    Criar Notificação
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Ajuda -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Dicas para criar notificações</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Use títulos claros e objetivos</li>
+                        <li>Personalize a mensagem conforme o tipo de notificação</li>
+                        <li>Defina a prioridade adequada para cada situação</li>
+                        <li>Agende notificações para horários apropriados</li>
+                        <li>Deixe o campo "Aluno" em branco para notificações gerais</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

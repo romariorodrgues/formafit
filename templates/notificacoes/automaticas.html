@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificações Automáticas{% endblock %}
+
+{% block breadcrumb %}
+<nav class="text-sm font-medium text-gray-600 mb-6">
+    <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+            <a href="{% url 'accounts:dashboard' %}" class="hover:text-blue-600">Dashboard</a>
+            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.476 239.030c9.373 9.372 9.373 24.568 0 33.941z"/>
+            </svg>
+        </li>
+        <li class="flex items-center">
+            <a href="{% url 'notificacoes:lista' %}" class="hover:text-blue-600">Notificações</a>
+            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.476 239.030c9.373 9.372 9.373 24.568 0 33.941z"/>
+            </svg>
+        </li>
+        <li class="text-gray-500">Notificações Automáticas</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow mb-6 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Notificações Automáticas</h1>
+                <p class="mt-1 text-sm text-gray-600">Configure as notificações que são enviadas automaticamente pelo sistema</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="p-2 bg-green-100 rounded-lg">
+                    <i class="fas fa-robot text-green-600"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-2xl font-semibold text-gray-900">{{ ativas }}</p>
+                    <p class="text-sm text-gray-600">Automáticas Ativas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center">
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <i class="fas fa-pause-circle text-red-600"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-2xl font-semibold text-gray-900">{{ inativas }}</p>
+                    <p class="text-sm text-gray-600">Automáticas Inativas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Notificações Automáticas -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-cogs text-blue-500 mr-2"></i>
+                Configurações Automáticas
+            </h2>
+        </div>
+        
+        {% if automaticas %}
+        <div class="divide-y divide-gray-200">
+            {% for automatica in automaticas %}
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                {% if automatica.ativa %}
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                {% else %}
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">{{ automatica.tipo_evento }}</h3>
+                                <p class="text-sm text-gray-600">{{ automatica.descricao }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Antecedência</p>
+                                <p class="text-sm text-gray-900">{{ automatica.antecedencia_dias }} dia{{ automatica.antecedencia_dias|pluralize }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Horário de Envio</p>
+                                <p class="text-sm text-gray-900">{{ automatica.horario_envio|time:"H:i" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Apenas Alunos Ativos</p>
+                                <p class="text-sm text-gray-900">
+                                    {% if automatica.apenas_alunos_ativos %}
+                                    <span class="text-green-600"><i class="fas fa-check mr-1"></i>Sim</span>
+                                    {% else %}
+                                    <span class="text-red-600"><i class="fas fa-times mr-1"></i>Não</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <p class="text-sm font-medium text-gray-700">Modelo de Mensagem</p>
+                            <div class="mt-1 p-3 bg-gray-50 rounded-lg border">
+                                <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ automatica.modelo_mensagem }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-shrink-0 ml-4">
+                        <div class="flex flex-col space-y-2">
+                            {% if automatica.ativa %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-check mr-1"></i>Ativa
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-pause mr-1"></i>Inativa
+                            </span>
+                            {% endif %}
+                            
+                            <a href="{% url 'notificacoes:automatica_editar' automatica.id %}" 
+                               class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs text-center">
+                                <i class="fas fa-edit mr-1"></i>Editar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-6 text-center">
+            <div class="max-w-sm mx-auto">
+                <i class="fas fa-robot text-gray-400 text-4xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma notificação automática configurada</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    As notificações automáticas são configuradas diretamente no código do sistema para eventos específicos como vencimento de mensalidades.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Informações sobre Notificações Automáticas -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-400 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-blue-800 mb-3">Como funcionam as Notificações Automáticas</h3>
+                <div class="text-sm text-blue-700 space-y-2">
+                    <p>
+                        <strong>Notificações automáticas</strong> são enviadas pelo sistema baseadas em eventos e datas específicas, como:
+                    </p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>Vencimento de Mensalidades:</strong> Enviadas automaticamente antes do vencimento</li>
+                        <li><strong>Lembretes de Treino:</strong> Para alunos que têm agendamentos</li>
+                        <li><strong>Aniversários:</strong> Mensagens de parabéns automáticas</li>
+                        <li><strong>Inadimplência:</strong> Alertas para pagamentos em atraso</li>
+                    </ul>
+                    <p class="mt-3">
+                        <strong>Dica:</strong> Você pode ativar/desativar cada tipo e configurar horários e antecedência de envio.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
