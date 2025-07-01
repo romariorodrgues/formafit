@@ -173,3 +173,7 @@ node_modules/
 
 # Cache files
 *.cache
+
+# Copilot instructions (workspace-specific)
+.github/copilot-instructions.md
+copilot-instructions.md
