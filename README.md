@@ -112,7 +112,7 @@ O FormaFit foi desenvolvido para resolver os principais desafios dos personal tr
 
 #### **1. Clone o Repositório**
 ```bash
-git clone https://github.com/seu-usuario/FormaFit.git
+git clone https://github.com/romariorodrgues/formafit.git
 cd FormaFit
 ```
 
@@ -200,7 +200,7 @@ GRANT ALL PRIVILEGES ON DATABASE formafit_db TO formafit_user;
 ```bash
 # Clone para diretório de produção
 cd /var/www
-sudo git clone https://github.com/seu-usuario/FormaFit.git
+sudo git clone https://github.com/romariorodrgues/formafit.git
 sudo chown -R www-data:www-data FormaFit
 cd FormaFit
 
@@ -542,9 +542,9 @@ Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICEN
 
 ## 📞 Suporte e Contato
 
-- **Documentação**: [Wiki do Projeto](https://github.com/seu-usuario/FormaFit/wiki)
-- **Issues**: [GitHub Issues](https://github.com/seu-usuario/FormaFit/issues)
-- **Discussões**: [GitHub Discussions](https://github.com/seu-usuario/FormaFit/discussions)
+- **Documentação**: [Wiki do Projeto](https://github.com/romariorodrgues/formafit/wiki)
+- **Issues**: [GitHub Issues](https://github.com/romariorodrgues/formafit/issues)
+- **Discussões**: [GitHub Discussions](https://github.com/romariorodrgues/formafit/discussions)
 
 ## 🎉 Agradecimentos
 
