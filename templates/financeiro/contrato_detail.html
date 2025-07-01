@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Contrato - {{ contrato.aluno.nome }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav class="flex" aria-label="Breadcrumb">
+            <ol role="list" class="flex items-center space-x-4">
+                <li>
+                    <div class="flex">
+                        <a href="{% url 'financeiro:lista_contratos' %}" class="text-sm font-medium text-gray-500 hover:text-gray-700">
+                            Contratos
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="ml-4 text-sm font-medium text-gray-500">{{ contrato.aluno.nome }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        
+        <div class="mt-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <img class="h-16 w-16 rounded-full object-cover" 
+                     src="{{ contrato.aluno.foto.url|default:'/static/img/default-avatar.png' }}" 
+                     alt="{{ contrato.aluno.nome }}">
+                <div class="ml-4">
+                    <h1 class="text-2xl font-bold text-gray-900">{{ contrato.aluno.nome }}</h1>
+                    <div class="flex items-center mt-1">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if contrato.status == 'ativo' %}bg-green-100 text-green-800
+                            {% elif contrato.status == 'suspenso' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ contrato.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                {% if contrato.status == 'ativo' %}
+                    <button onclick="suspenderContrato()" 
+                            class="inline-flex items-center px-4 py-2 border border-yellow-300 text-sm font-medium rounded-md text-yellow-700 bg-yellow-50 hover:bg-yellow-100">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Suspender
+                    </button>
+                {% elif contrato.status == 'suspenso' %}
+                    <button onclick="reativarContrato()" 
+                            class="inline-flex items-center px-4 py-2 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a4.5 4.5 0 100-9H9c0 2.5 2 4.5 4 4.5s4-2 4-4.5 4 2 4 4.5z"/>
+                        </svg>
+                        Reativar
+                    </button>
+                {% endif %}
+                <a href="{% url 'financeiro:criar_fatura' %}?aluno={{ contrato.aluno.id }}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Nova Fatura
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Informações do Contrato -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Dados Principais -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Informações do Contrato</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Plano</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ contrato.plano.nome }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Valor Mensal</dt>
+                            <dd class="mt-1 text-sm text-gray-900">R$ {{ contrato.plano.valor }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Data de Início</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ contrato.data_inicio|date:"d/m/Y" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Data de Fim</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if contrato.data_fim %}
+                                    {{ contrato.data_fim|date:"d/m/Y" }}
+                                {% else %}
+                                    Indefinido
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Dia de Vencimento</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ contrato.dia_vencimento }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Status</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if contrato.status == 'ativo' %}bg-green-100 text-green-800
+                                    {% elif contrato.status == 'suspenso' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ contrato.get_status_display }}
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                    {% if contrato.observacoes %}
+                        <div class="mt-6">
+                            <dt class="text-sm font-medium text-gray-500">Observações</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ contrato.observacoes }}</dd>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Histórico de Faturas -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Histórico de Faturas</h3>
+                </div>
+                <div class="overflow-hidden">
+                    {% if faturas %}
+                        <ul role="list" class="divide-y divide-gray-200">
+                            {% for fatura in faturas %}
+                                <li class="px-6 py-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    Fatura #{{ fatura.numero }}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    Vencimento: {{ fatura.data_vencimento|date:"d/m/Y" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-4">
+                                            <div class="text-right">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    R$ {{ fatura.valor }}
+                                                </div>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    {% if fatura.status == 'paga' %}bg-green-100 text-green-800
+                                                    {% elif fatura.status == 'vencida' %}bg-red-100 text-red-800
+                                                    {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                                    {{ fatura.get_status_display }}
+                                                </span>
+                                            </div>
+                                            <a href="{% url 'financeiro:fatura_detail' fatura.id %}" 
+                                               class="text-blue-600 hover:text-blue-900">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center py-12">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhuma fatura encontrada</h3>
+                            <p class="mt-1 text-sm text-gray-500">Comece criando uma nova fatura para este aluno.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Resumo Financeiro -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Resumo Financeiro</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <dl class="space-y-4">
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Faturado</dt>
+                            <dd class="text-sm text-gray-900">R$ {{ resumo.total_faturado|default:"0,00" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Pago</dt>
+                            <dd class="text-sm text-green-600">R$ {{ resumo.total_pago|default:"0,00" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Em Aberto</dt>
+                            <dd class="text-sm text-yellow-600">R$ {{ resumo.total_aberto|default:"0,00" }}</dd>
+                        </div>
+                        <div class="flex justify-between border-t pt-4">
+                            <dt class="text-sm font-medium text-gray-500">Em Atraso</dt>
+                            <dd class="text-sm text-red-600">R$ {{ resumo.total_vencido|default:"0,00" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Dados do Aluno -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Dados do Aluno</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <dl class="space-y-4">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Email</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ contrato.aluno.email|default:"Não informado" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Telefone</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ contrato.aluno.telefone|default:"Não informado" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Data de Nascimento</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if contrato.aluno.data_nascimento %}
+                                    {{ contrato.aluno.data_nascimento|date:"d/m/Y" }}
+                                {% else %}
+                                    Não informado
+                                {% endif %}
+                            </dd>
+                        </div>
+                    </dl>
+                    <div class="mt-6">
+                        <a href="{% url 'alunos:detalhe' contrato.aluno.id %}" 
+                           class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                            Ver perfil completo →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Ações Rápidas</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="space-y-3">
+                        <a href="{% url 'financeiro:criar_fatura' %}?aluno={{ contrato.aluno.id }}" 
+                           class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            Nova Fatura
+                        </a>
+                        <a href="{% url 'financeiro:lista_faturas' %}?aluno={{ contrato.aluno.id }}" 
+                           class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Ver Todas as Faturas
+                        </a>
+                        <a href="{% url 'relatorios:gerar' %}?aluno={{ contrato.aluno.id }}" 
+                           class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Gerar Relatório
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div id="confirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Confirmar Ação</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500" id="modalMessage">
+                    Tem certeza que deseja realizar esta ação?
+                </p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="confirmBtn" 
+                        class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    Confirmar
+                </button>
+                <button onclick="closeModal()" 
+                        class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function suspenderContrato() {
+    document.getElementById('modalTitle').textContent = 'Suspender Contrato';
+    document.getElementById('modalMessage').textContent = 'Tem certeza que deseja suspender este contrato? O aluno não será mais cobrado.';
+    document.getElementById('confirmBtn').onclick = function() {
+        updateContrato('suspenso');
+    };
+    document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function reativarContrato() {
+    document.getElementById('modalTitle').textContent = 'Reativar Contrato';
+    document.getElementById('modalMessage').textContent = 'Tem certeza que deseja reativar este contrato? O aluno voltará a ser cobrado.';
+    document.getElementById('confirmBtn').onclick = function() {
+        updateContrato('ativo');
+    };
+    document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function updateContrato(status) {
+    fetch(`{% url 'financeiro:ajax_update_contrato' contrato.id %}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            'status': status
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Erro ao atualizar contrato: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erro ao atualizar contrato');
+    });
+    closeModal();
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

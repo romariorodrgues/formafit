@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Faturas - FormaFit{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Faturas</h1>
+                    <p class="mt-2 text-gray-600">Gerencie todas as faturas dos seus alunos</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="{% url 'financeiro:criar_fatura' %}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Nova Fatura
+                    </a>
+                    <a href="{% url 'financeiro:gerar_faturas_automaticas' %}" 
+                       class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-magic mr-2"></i>Gerar Automáticas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow-sm mb-6 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Filtros</h3>
+            <form method="get" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Aluno</label>
+                    {{ filtro_form.aluno }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    {{ filtro_form.status }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mês</label>
+                    {{ filtro_form.mes_referencia }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ano</label>
+                    {{ filtro_form.ano_referencia }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Venc. Início</label>
+                    {{ filtro_form.data_vencimento_inicio }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Venc. Fim</label>
+                    {{ filtro_form.data_vencimento_fim }}
+                </div>
+                <div class="md:col-span-3 lg:col-span-6 flex gap-3">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Filtrar
+                    </button>
+                    <a href="{% url 'financeiro:lista_faturas' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <i class="fas fa-file-invoice text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total de Faturas</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_faturas }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Faturas Pagas</p>
+                        <p class="text-2xl font-bold text-green-600">{{ faturas_pagas }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-red-100 rounded-lg">
+                        <i class="fas fa-exclamation-circle text-red-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Pendentes</p>
+                        <p class="text-2xl font-bold text-red-600">{{ faturas_pendentes }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-yellow-100 rounded-lg">
+                        <i class="fas fa-dollar-sign text-yellow-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Valor Total</p>
+                        <p class="text-2xl font-bold text-gray-900">R$ {{ valor_total|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Faturas -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aluno
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Período
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Valor
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Vencimento
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for fatura in faturas %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        {% if fatura.aluno.foto %}
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ fatura.aluno.foto.url }}" alt="">
+                                        {% else %}
+                                            <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                                <i class="fas fa-user text-gray-600"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ fatura.aluno.nome }}</div>
+                                        <div class="text-sm text-gray-500">{{ fatura.aluno.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ fatura.mes_referencia|stringformat:"02d" }}/{{ fatura.ano_referencia }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                R$ {{ fatura.valor_final|floatformat:2 }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ fatura.data_vencimento|date:"d/m/Y" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if fatura.status == 'paga' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>Paga
+                                    </span>
+                                {% elif fatura.status == 'atrasada' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>Atrasada
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-clock mr-1"></i>Pendente
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end gap-2">
+                                    <a href="{% url 'financeiro:fatura_detail' fatura.pk %}" 
+                                       class="text-blue-600 hover:text-blue-900" title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if fatura.status != 'paga' %}
+                                    <a href="{% url 'financeiro:registrar_pagamento' fatura.pk %}" 
+                                       class="text-green-600 hover:text-green-900" title="Registrar pagamento">
+                                        <i class="fas fa-money-bill"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-file-invoice text-4xl mb-4"></i>
+                                <p class="text-lg">Nenhuma fatura encontrada</p>
+                                <p class="text-sm">Crie sua primeira fatura ou ajuste os filtros.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.form-control:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+</style>
+{% endblock %}

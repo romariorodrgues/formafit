@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Criar Fatura - FormaFit{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Criar Nova Fatura</h1>
+                    <p class="mt-2 text-gray-600">Crie uma fatura manual para um aluno</p>
+                </div>
+                <a href="{% url 'financeiro:lista_faturas' %}" 
+                   class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulário -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Aluno -->
+                <div>
+                    <label for="{{ form.aluno.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Aluno *
+                    </label>
+                    {{ form.aluno }}
+                    {% if form.aluno.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.aluno.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Período de Referência -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.mes_referencia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Mês de Referência *
+                        </label>
+                        {{ form.mes_referencia }}
+                        {% if form.mes_referencia.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.mes_referencia.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.ano_referencia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Ano de Referência *
+                        </label>
+                        {{ form.ano_referencia }}
+                        {% if form.ano_referencia.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.ano_referencia.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Valores -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.valor_base.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Valor Base (R$) *
+                        </label>
+                        {{ form.valor_base }}
+                        {% if form.valor_base.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.valor_base.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.data_vencimento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Data de Vencimento *
+                        </label>
+                        {{ form.data_vencimento }}
+                        {% if form.data_vencimento.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.data_vencimento.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.desconto.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Desconto (R$)
+                        </label>
+                        {{ form.desconto }}
+                        {% if form.desconto.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.desconto.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.multa.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Multa (R$)
+                        </label>
+                        {{ form.multa }}
+                        {% if form.multa.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.multa.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Observações
+                    </label>
+                    {{ form.observacoes }}
+                    {% if form.observacoes.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+                    <a href="{% url 'financeiro:lista_faturas' %}" 
+                       class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-save mr-2"></i>Criar Fatura
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dica -->
+        <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex">
+                <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                <div>
+                    <h4 class="text-sm font-medium text-blue-900">Dica:</h4>
+                    <p class="text-sm text-blue-700 mt-1">
+                        O valor final da fatura será calculado automaticamente: Valor Base - Desconto + Multa.
+                        Certifique-se de que o aluno possui um contrato ativo antes de criar a fatura.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.form-control:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+</style>
+{% endblock %}

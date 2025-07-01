@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}Controle de Inadimplência{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: bold; color: #1f2937; margin: 0;">
+                Controle de Inadimplência
+            </h1>
+            <p style="color: #6b7280; margin: 0.5rem 0 0 0;">
+                Gestão de faturas vencidas e cobranças
+            </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button onclick="enviarLembretesGeral()" 
+                    style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; border-radius: 0.5rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                <svg style="width: 1rem; height: 1rem; display: inline-block; margin-right: 0.5rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                </svg>
+                Enviar Lembretes
+            </button>
+            <a href="{% url 'financeiro:relatorio_financeiro' %}" 
+               style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; text-decoration: none; color: #374151; font-weight: 500; background: white; transition: all 0.2s;">
+                <svg style="width: 1rem; height: 1rem; display: inline-block; margin-right: 0.5rem; vertical-align: middle;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Relatório Geral
+            </a>
+        </div>
+    </div>
+
+    <!-- Resumo da Inadimplência -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Total em Atraso -->
+        <div style="background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 1rem; padding: 1.5rem; color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin: 0;">
+                        TOTAL EM ATRASO
+                    </h3>
+                    <p style="font-size: 1.75rem; font-weight: bold; margin: 0.5rem 0 0 0;">
+                        R$ {{ resumo.total_em_atraso|floatformat:2 }}
+                    </p>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem;">
+                    <svg style="width: 1.5rem; height: 1.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 0.875rem; opacity: 0.9;">
+                <span>{{ resumo.faturas_vencidas }} faturas vencidas</span>
+            </div>
+        </div>
+
+        <!-- Clientes Inadimplentes -->
+        <div style="background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 1rem; padding: 1.5rem; color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin: 0;">
+                        CLIENTES INADIMPLENTES
+                    </h3>
+                    <p style="font-size: 1.75rem; font-weight: bold; margin: 0.5rem 0 0 0;">
+                        {{ resumo.clientes_inadimplentes }}
+                    </p>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem;">
+                    <svg style="width: 1.5rem; height: 1.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 0.875rem; opacity: 0.9;">
+                <span>De {{ resumo.total_clientes }} clientes ativos</span>
+            </div>
+        </div>
+
+        <!-- Taxa de Inadimplência -->
+        <div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 1rem; padding: 1.5rem; color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin: 0;">
+                        TAXA DE INADIMPLÊNCIA
+                    </h3>
+                    <p style="font-size: 1.75rem; font-weight: bold; margin: 0.5rem 0 0 0;">
+                        {{ resumo.taxa_inadimplencia|floatformat:1 }}%
+                    </p>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem;">
+                    <svg style="width: 1.5rem; height: 1.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 0.875rem; opacity: 0.9;">
+                <span>Meta: abaixo de 5%</span>
+            </div>
+        </div>
+
+        <!-- Média de Atraso -->
+        <div style="background: linear-gradient(135deg, #06b6d4, #0891b2); border-radius: 1rem; padding: 1.5rem; color: white;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="font-size: 0.875rem; font-weight: 500; opacity: 0.9; margin: 0;">
+                        MÉDIA DE ATRASO
+                    </h3>
+                    <p style="font-size: 1.75rem; font-weight: bold; margin: 0.5rem 0 0 0;">
+                        {{ resumo.media_dias_atraso }} dias
+                    </p>
+                </div>
+                <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.2); border-radius: 0.75rem;">
+                    <svg style="width: 1.5rem; height: 1.5rem;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 0.875rem; opacity: 0.9;">
+                <span>Faturamentos em atraso</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div style="background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: #1f2937; margin: 0 0 1rem 0;">
+            Filtros
+        </h3>
+        
+        <form method="get" style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                    Dias de Atraso (mínimo)
+                </label>
+                <select name="dias_atraso" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                    <option value="">Todos</option>
+                    <option value="1" {% if request.GET.dias_atraso == '1' %}selected{% endif %}>1+ dias</option>
+                    <option value="7" {% if request.GET.dias_atraso == '7' %}selected{% endif %}>7+ dias</option>
+                    <option value="15" {% if request.GET.dias_atraso == '15' %}selected{% endif %}>15+ dias</option>
+                    <option value="30" {% if request.GET.dias_atraso == '30' %}selected{% endif %}>30+ dias</option>
+                    <option value="60" {% if request.GET.dias_atraso == '60' %}selected{% endif %}>60+ dias</option>
+                </select>
+            </div>
+            
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                    Valor Mínimo (R$)
+                </label>
+                <input type="number" name="valor_minimo" value="{{ request.GET.valor_minimo }}" step="0.01" min="0"
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+            </div>
+            
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                    Ordenar por
+                </label>
+                <select name="ordenar" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                    <option value="dias_atraso" {% if request.GET.ordenar == 'dias_atraso' %}selected{% endif %}>Dias de atraso (desc)</option>
+                    <option value="valor" {% if request.GET.ordenar == 'valor' %}selected{% endif %}>Valor (desc)</option>
+                    <option value="vencimento" {% if request.GET.ordenar == 'vencimento' %}selected{% endif %}>Data vencimento</option>
+                    <option value="aluno" {% if request.GET.ordenar == 'aluno' %}selected{% endif %}>Nome do aluno</option>
+                </select>
+            </div>
+            
+            <button type="submit" 
+                    style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; height: fit-content;">
+                Filtrar
+            </button>
+        </form>
+    </div>
+
+    <!-- Lista de Faturas Vencidas -->
+    <div style="background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; color: #1f2937; margin: 0;">
+                Faturas Vencidas ({{ faturas_vencidas.count }})
+            </h3>
+            <div style="display: flex; gap: 0.5rem;">
+                <button onclick="selecionarTodas()" 
+                        style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background: white; color: #374151; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    Selecionar Todas
+                </button>
+                <button onclick="enviarLembreteSelecionadas()" 
+                        style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; border-radius: 0.5rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                    Enviar Lembretes
+                </button>
+            </div>
+        </div>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #e5e7eb;">
+                        <th style="text-align: left; padding: 1rem 0.5rem; font-weight: 600; color: #374151; width: 50px;">
+                            <input type="checkbox" id="selectAll" onchange="toggleAll(this)" 
+                                   style="width: 1.25rem; height: 1.25rem; accent-color: #3b82f6;">
+                        </th>
+                        <th style="text-align: left; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Aluno</th>
+                        <th style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Plano</th>
+                        <th style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Vencimento</th>
+                        <th style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Dias Atraso</th>
+                        <th style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Valor</th>
+                        <th style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Contato</th>
+                        <th style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #374151;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fatura in faturas_vencidas %}
+                    <tr style="border-bottom: 1px solid #f3f4f6;" data-fatura-id="{{ fatura.id }}">
+                        <td style="padding: 1rem 0.5rem;">
+                            <input type="checkbox" name="faturas_selecionadas" value="{{ fatura.id }}" 
+                                   style="width: 1.25rem; height: 1.25rem; accent-color: #3b82f6;">
+                        </td>
+                        <td style="padding: 1rem 0.5rem;">
+                            <div style="font-weight: 500;">{{ fatura.contrato.aluno.nome }}</div>
+                            <div style="font-size: 0.875rem; color: #6b7280;">{{ fatura.contrato.aluno.email }}</div>
+                        </td>
+                        <td style="text-align: center; padding: 1rem 0.5rem;">
+                            <span style="padding: 0.25rem 0.75rem; background: #f3f4f6; border-radius: 9999px; font-size: 0.875rem; color: #374151;">
+                                {{ fatura.contrato.plano.nome }}
+                            </span>
+                        </td>
+                        <td style="text-align: center; padding: 1rem 0.5rem;">
+                            <div style="font-weight: 500;">{{ fatura.data_vencimento|date:"d/m/Y" }}</div>
+                            <div style="font-size: 0.875rem; color: #6b7280;">{{ fatura.data_vencimento|date:"D" }}</div>
+                        </td>
+                        <td style="text-align: center; padding: 1rem 0.5rem;">
+                            <span style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; 
+                                         {% if fatura.dias_atraso <= 7 %}background: #fef3c7; color: #92400e;
+                                         {% elif fatura.dias_atraso <= 30 %}background: #fed7aa; color: #ea580c;
+                                         {% else %}background: #fee2e2; color: #991b1b;{% endif %}">
+                                {{ fatura.dias_atraso }} dias
+                            </span>
+                        </td>
+                        <td style="text-align: center; padding: 1rem 0.5rem; font-weight: 600; color: #ef4444;">
+                            R$ {{ fatura.valor|floatformat:2 }}
+                        </td>
+                        <td style="text-align: center; padding: 1rem 0.5rem;">
+                            {% if fatura.contrato.aluno.telefone %}
+                                <a href="https://wa.me/55{{ fatura.contrato.aluno.telefone }}" target="_blank"
+                                   style="padding: 0.25rem 0.5rem; background: #dcfce7; color: #166534; border-radius: 0.375rem; text-decoration: none; font-size: 0.875rem; font-weight: 500;">
+                                    <svg style="width: 1rem; height: 1rem; display: inline-block; margin-right: 0.25rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.106"/>
+                                    </svg>
+                                    WhatsApp
+                                </a>
+                            {% else %}
+                                <span style="color: #6b7280; font-size: 0.875rem;">Sem contato</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center; padding: 1rem 0.5rem;">
+                            <div style="display: flex; gap: 0.25rem; justify-content: center;">
+                                <a href="{% url 'financeiro:fatura_detail' fatura.id %}" 
+                                   style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; text-decoration: none; color: #374151; transition: all 0.2s;"
+                                   title="Ver detalhes">
+                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </a>
+                                <a href="{% url 'financeiro:registrar_pagamento' fatura.id %}" 
+                                   style="padding: 0.5rem; background: #dcfce7; color: #166534; border-radius: 0.375rem; text-decoration: none; transition: all 0.2s;"
+                                   title="Registrar pagamento">
+                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </a>
+                                <button onclick="enviarLembrete({{ fatura.id }})" 
+                                        style="padding: 0.5rem; background: #fef3c7; color: #92400e; border: none; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s;"
+                                        title="Enviar lembrete">
+                                    <svg style="width: 1rem; height: 1rem;" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 3rem; color: #6b7280;">
+                            <svg style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: #d1d5db;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h4 style="font-size: 1.125rem; font-weight: 600; color: #374151; margin: 0 0 0.5rem 0;">
+                                Nenhuma fatura vencida encontrada!
+                            </h4>
+                            <p style="color: #6b7280; margin: 0;">
+                                {% if request.GET.dias_atraso or request.GET.valor_minimo %}
+                                    Ajuste os filtros para ver mais resultados.
+                                {% else %}
+                                    Parabéns! Todos os pagamentos estão em dia.
+                                {% endif %}
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if faturas_vencidas.has_other_pages %}
+        <div style="display: flex; justify-content: center; margin-top: 2rem;">
+            <nav style="display: flex; gap: 0.25rem;">
+                {% if faturas_vencidas.has_previous %}
+                    <a href="?page={{ faturas_vencidas.previous_page_number }}" 
+                       style="padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; text-decoration: none; color: #374151;">
+                        « Anterior
+                    </a>
+                {% endif %}
+                
+                <span style="padding: 0.5rem 0.75rem; background: #3b82f6; color: white; border-radius: 0.375rem;">
+                    {{ faturas_vencidas.number }} de {{ faturas_vencidas.paginator.num_pages }}
+                </span>
+                
+                {% if faturas_vencidas.has_next %}
+                    <a href="?page={{ faturas_vencidas.next_page_number }}" 
+                       style="padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; text-decoration: none; color: #374151;">
+                        Próxima »
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Scripts para funcionalidades interativas -->
+<script>
+// Função para alternar seleção de todos os checkboxes
+function toggleAll(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('input[name="faturas_selecionadas"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = masterCheckbox.checked;
+    });
+}
+
+// Função para selecionar todas as faturas
+function selecionarTodas() {
+    const checkboxes = document.querySelectorAll('input[name="faturas_selecionadas"]');
+    const masterCheckbox = document.getElementById('selectAll');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    masterCheckbox.checked = true;
+}
+
+// Função para enviar lembrete individual
+function enviarLembrete(faturaId) {
+    if (confirm('Enviar lembrete de pagamento para este aluno?')) {
+        // Simular envio de lembrete
+        alert('Lembrete enviado com sucesso!');
+        // Aqui seria feita a chamada AJAX real
+    }
+}
+
+// Função para enviar lembretes das faturas selecionadas
+function enviarLembreteSelecionadas() {
+    const selecionadas = document.querySelectorAll('input[name="faturas_selecionadas"]:checked');
+    
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma fatura para enviar lembretes.');
+        return;
+    }
+    
+    if (confirm(`Enviar lembretes para ${selecionadas.length} faturas selecionadas?`)) {
+        // Simular envio de lembretes
+        alert(`${selecionadas.length} lembretes enviados com sucesso!`);
+        // Aqui seria feita a chamada AJAX real
+    }
+}
+
+// Função para enviar lembretes gerais
+function enviarLembretesGeral() {
+    if (confirm('Enviar lembretes para todas as faturas vencidas?')) {
+        // Simular envio de lembretes
+        alert('Lembretes enviados para todas as faturas vencidas!');
+        // Aqui seria feita a chamada AJAX real
+    }
+}
+
+// Atualizar estado do checkbox master quando checkboxes individuais mudam
+document.addEventListener('DOMContentLoaded', function() {
+    const masterCheckbox = document.getElementById('selectAll');
+    const individualCheckboxes = document.querySelectorAll('input[name="faturas_selecionadas"]');
+    
+    individualCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const totalCheckboxes = individualCheckboxes.length;
+            const checkedCheckboxes = document.querySelectorAll('input[name="faturas_selecionadas"]:checked').length;
+            
+            if (checkedCheckboxes === 0) {
+                masterCheckbox.indeterminate = false;
+                masterCheckbox.checked = false;
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                masterCheckbox.indeterminate = false;
+                masterCheckbox.checked = true;
+            } else {
+                masterCheckbox.indeterminate = true;
+            }
+        });
+    });
+});
+</script>
+
+<style>
+/* Hover effects para linhas da tabela */
+tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Estilização dos botões de ação */
+button:hover, a:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .grid-auto-fit {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .flex-wrap {
+        flex-direction: column !important;
+    }
+    
+    .overflow-x-auto {
+        font-size: 0.875rem;
+    }
+    
+    /* Ocultar algumas colunas em mobile */
+    th:nth-child(3),
+    td:nth-child(3),
+    th:nth-child(7),
+    td:nth-child(7) {
+        display: none;
+    }
+}
+
+/* Estilização personalizada dos checkboxes */
+input[type="checkbox"] {
+    cursor: pointer;
+}
+
+input[type="checkbox"]:indeterminate {
+    background-color: #3b82f6;
+}
+
+/* Animações suaves */
+* {
+    transition: all 0.2s ease-in-out;
+}
+</style>
+{% endblock %}

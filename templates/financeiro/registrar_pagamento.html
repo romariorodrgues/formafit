@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registrar Pagamento - FormaFit{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Registrar Pagamento</h1>
+                    <p class="mt-2 text-gray-600">Registre um pagamento para a fatura selecionada</p>
+                </div>
+                <a href="{% url 'financeiro:fatura_detail' fatura.pk %}" 
+                   class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Formulário de Pagamento -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Dados do Pagamento</h3>
+                
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Valor Pago -->
+                    <div>
+                        <label for="{{ form.valor_pago.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Valor Pago (R$) *
+                        </label>
+                        {{ form.valor_pago }}
+                        {% if form.valor_pago.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.valor_pago.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">Valor disponível para pagamento: R$ {{ fatura.valor_final|floatformat:2 }}</p>
+                    </div>
+
+                    <!-- Data do Pagamento -->
+                    <div>
+                        <label for="{{ form.data_pagamento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Data do Pagamento *
+                        </label>
+                        {{ form.data_pagamento }}
+                        {% if form.data_pagamento.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.data_pagamento.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Forma de Pagamento -->
+                    <div>
+                        <label for="{{ form.forma_pagamento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Forma de Pagamento *
+                        </label>
+                        {{ form.forma_pagamento }}
+                        {% if form.forma_pagamento.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.forma_pagamento.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Observações -->
+                    <div>
+                        <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Observações
+                        </label>
+                        {{ form.observacoes }}
+                        {% if form.observacoes.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">Ex: Número da transação, comprovante, etc.</p>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+                        <a href="{% url 'financeiro:fatura_detail' fatura.pk %}" 
+                           class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-money-bill mr-2"></i>Registrar Pagamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Informações da Fatura -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Informações da Fatura</h3>
+                
+                <!-- Dados do Aluno -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        {% if fatura.aluno.foto %}
+                            <img class="h-16 w-16 rounded-full object-cover mr-4" src="{{ fatura.aluno.foto.url }}" alt="">
+                        {% else %}
+                            <div class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-gray-600 text-xl"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900">{{ fatura.aluno.nome }}</h4>
+                            <p class="text-gray-600">{{ fatura.aluno.email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados da Fatura -->
+                <div class="space-y-4">
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Período:</span>
+                        <span class="font-medium text-gray-900">{{ fatura.mes_referencia|stringformat:"02d" }}/{{ fatura.ano_referencia }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Data de Vencimento:</span>
+                        <span class="font-medium text-gray-900">{{ fatura.data_vencimento|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Valor da Fatura:</span>
+                        <span class="font-bold text-lg text-gray-900">R$ {{ fatura.valor_final|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between py-2 border-b border-gray-200">
+                        <span class="text-gray-600">Status Atual:</span>
+                        <span>
+                            {% if fatura.status == 'paga' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle mr-1"></i>Paga
+                                </span>
+                            {% elif fatura.status == 'atrasada' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>Atrasada
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i class="fas fa-clock mr-1"></i>Pendente
+                                </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Formas de Pagamento Disponíveis -->
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h5 class="text-sm font-medium text-blue-900 mb-2">Formas de Pagamento Aceitas:</h5>
+                    <div class="grid grid-cols-2 gap-2 text-sm text-blue-700">
+                        <div><i class="fas fa-money-bill mr-1"></i>Dinheiro</div>
+                        <div><i class="fas fa-credit-card mr-1"></i>Cartão de Débito</div>
+                        <div><i class="fas fa-credit-card mr-1"></i>Cartão de Crédito</div>
+                        <div><i class="fas fa-university mr-1"></i>Transferência</div>
+                        <div><i class="fas fa-qrcode mr-1"></i>PIX</div>
+                        <div><i class="fas fa-barcode mr-1"></i>Boleto</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dica -->
+        <div class="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex">
+                <i class="fas fa-lightbulb text-green-600 mt-1 mr-3"></i>
+                <div>
+                    <h4 class="text-sm font-medium text-green-900">Dica:</h4>
+                    <p class="text-sm text-green-700 mt-1">
+                        Após registrar o pagamento, o status da fatura será atualizado automaticamente.
+                        Se o valor pago for igual ao valor da fatura, ela será marcada como "Paga".
+                        Pagamentos parciais também são permitidos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.form-control:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+</style>
+{% endblock %}

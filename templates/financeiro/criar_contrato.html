@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}Novo Contrato{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <nav class="flex" aria-label="Breadcrumb">
+            <ol role="list" class="flex items-center space-x-4">
+                <li>
+                    <div class="flex">
+                        <a href="{% url 'financeiro:lista_contratos' %}" class="text-sm font-medium text-gray-500 hover:text-gray-700">
+                            Contratos
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="ml-4 text-sm font-medium text-gray-500">Novo Contrato</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        
+        <div class="mt-4">
+            <h1 class="text-2xl font-bold text-gray-900">Criar Novo Contrato</h1>
+            <p class="mt-1 text-sm text-gray-600">Crie um contrato para definir os termos do serviço com seu aluno.</p>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="bg-white shadow rounded-lg">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Dados do Contrato -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Informações do Contrato</h3>
+                <p class="mt-1 text-sm text-gray-600">Defina os detalhes do contrato e plano de treinamento.</p>
+            </div>
+            
+            <div class="px-6 py-4 space-y-6">
+                <!-- Aluno -->
+                <div>
+                    <label for="{{ form.aluno.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.aluno.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.aluno }}
+                    </div>
+                    {% if form.aluno.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.aluno.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Plano -->
+                <div>
+                    <label for="{{ form.plano.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.plano.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.plano }}
+                    </div>
+                    {% if form.plano.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.plano.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">
+                        O valor e características do plano selecionado serão aplicados ao contrato.
+                    </p>
+                </div>
+
+                <!-- Datas -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="{{ form.data_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.data_inicio.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.data_inicio }}
+                        </div>
+                        {% if form.data_inicio.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.data_inicio.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.data_fim.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.data_fim.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.data_fim }}
+                        </div>
+                        {% if form.data_fim.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.data_fim.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">
+                            Deixe em branco para contrato por tempo indeterminado.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Dia de Vencimento -->
+                <div>
+                    <label for="{{ form.dia_vencimento.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.dia_vencimento.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.dia_vencimento }}
+                    </div>
+                    {% if form.dia_vencimento.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.dia_vencimento.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">
+                        Dia do mês em que as faturas vencerão (1-31).
+                    </p>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.status.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.status }}
+                    </div>
+                    {% if form.status.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.status.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.observacoes.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.observacoes }}
+                    </div>
+                    {% if form.observacoes.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500">
+                        Informações adicionais sobre o contrato (opcional).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Opções de Faturamento -->
+            <div class="px-6 py-4 border-t border-gray-200">
+                <h4 class="text-base font-medium text-gray-900 mb-4">Opções de Faturamento</h4>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input type="checkbox" id="gerar_primeira_fatura" name="gerar_primeira_fatura" 
+                                   class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="gerar_primeira_fatura" class="font-medium text-gray-700">
+                                Gerar primeira fatura automaticamente
+                            </label>
+                            <p class="text-gray-500">
+                                Uma fatura será criada automaticamente com vencimento no próximo dia especificado.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+                <a href="{% url 'financeiro:lista_contratos' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Criar Contrato
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preview do Plano -->
+    <div id="plano-preview" class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
+        <h4 class="text-sm font-medium text-blue-900 mb-2">Preview do Plano Selecionado</h4>
+        <div id="plano-details" class="text-sm text-blue-700">
+            <!-- Detalhes do plano serão carregados aqui via JavaScript -->
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para campos do formulário */
+#id_aluno, #id_plano, #id_status {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+}
+
+#id_aluno:focus, #id_plano:focus, #id_status:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#id_data_inicio, #id_data_fim {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+}
+
+#id_data_inicio:focus, #id_data_fim:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#id_dia_vencimento {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+}
+
+#id_dia_vencimento:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#id_observacoes {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    min-height: 80px;
+    resize: vertical;
+}
+
+#id_observacoes:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const planoSelect = document.getElementById('id_plano');
+    const previewDiv = document.getElementById('plano-preview');
+    const detailsDiv = document.getElementById('plano-details');
+    
+    // Set data de início para hoje
+    const dataInicioInput = document.getElementById('id_data_inicio');
+    if (dataInicioInput && !dataInicioInput.value) {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        dataInicioInput.value = formattedDate;
+    }
+    
+    // Carregar detalhes do plano quando selecionado
+    planoSelect.addEventListener('change', function() {
+        const planoId = this.value;
+        if (planoId) {
+            fetch(`{% url 'financeiro:ajax_plano_details' 0 %}`.replace('0', planoId))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        detailsDiv.innerHTML = `
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <strong>Valor:</strong> R$ ${data.plano.valor}
+                                </div>
+                                <div>
+                                    <strong>Duração:</strong> ${data.plano.duracao_meses} meses
+                                </div>
+                                <div class="col-span-2">
+                                    <strong>Descrição:</strong> ${data.plano.descricao || 'Sem descrição'}
+                                </div>
+                            </div>
+                        `;
+                        previewDiv.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar detalhes do plano:', error);
+                });
+        } else {
+            previewDiv.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}

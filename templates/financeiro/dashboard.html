@@ -89,18 +89,24 @@
 
     <!-- Botões de Ação Rápida -->
     <div class="mb-8 flex flex-wrap gap-4">
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed">
+        <a href="{% url 'financeiro:criar_fatura' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
             <i class="fas fa-plus mr-2"></i>Nova Fatura
-            <span class="ml-2 text-xs bg-blue-500 px-2 py-1 rounded">Em breve</span>
-        </button>
-        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed">
+        </a>
+        <a href="{% url 'financeiro:criar_contrato' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
             <i class="fas fa-file-contract mr-2"></i>Novo Contrato
-            <span class="ml-2 text-xs bg-green-500 px-2 py-1 rounded">Em breve</span>
-        </button>
-        <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors opacity-50 cursor-not-allowed">
+        </a>
+        <a href="{% url 'financeiro:relatorio_financeiro' %}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
             <i class="fas fa-chart-bar mr-2"></i>Relatório Financeiro
-            <span class="ml-2 text-xs bg-purple-500 px-2 py-1 rounded">Em breve</span>
-        </button>
+        </a>
+        <a href="{% url 'financeiro:lista_planos' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+            <i class="fas fa-tags mr-2"></i>Gerenciar Planos
+        </a>
+        <a href="{% url 'financeiro:lista_faturas' %}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+            <i class="fas fa-list mr-2"></i>Todas as Faturas
+        </a>
+        <a href="{% url 'financeiro:inadimplencia' %}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Inadimplência
+        </a>
     </div>
 
     <!-- Seções Principais -->
@@ -159,20 +165,17 @@
             </div>
         </div>
 
-        <!-- Gráfico de Receitas (Placeholder) -->
+        <!-- Gráfico de Receitas -->
         <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h3 class="text-lg font-medium text-gray-900">Receitas dos Últimos 6 Meses</h3>
+                <a href="{% url 'financeiro:relatorio_financeiro' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    Ver relatório completo →
+                </a>
             </div>
             <div class="p-6">
-                <div class="text-center py-8">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                        <path d="M9 17v-2a2 2 0 012-2h6m0 0V9a2 2 0 112 0v4h6a2 2 0 012 2v2M9 17l4 4 4-4m6 0l4 4 4-4m-6-8v4m0 0h6m-6 0H9m12 0v8m0 0H9m12 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">Gráfico em Desenvolvimento</h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Visualização de receitas estará disponível em breve.
-                    </p>
+                <div class="h-64">
+                    <canvas id="receitasChart"></canvas>
                 </div>
             </div>
         </div>
@@ -214,4 +217,59 @@
         </div>
     </div>
 </div>
+
+<script>
+// Configuração do gráfico de receitas
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('receitasChart');
+    if (ctx) {
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Receitas (R$)',
+                    data: [
+                        {{ receitas_ultimos_meses.0|default:0 }},
+                        {{ receitas_ultimos_meses.1|default:0 }},
+                        {{ receitas_ultimos_meses.2|default:0 }},
+                        {{ receitas_ultimos_meses.3|default:0 }},
+                        {{ receitas_ultimos_meses.4|default:0 }},
+                        {{ receitas_ultimos_meses.5|default:0 }}
+                    ],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + value.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

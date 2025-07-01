@@ -63,11 +63,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['total_alunos_inativos'] = Aluno.objects.filter(personal_trainer=user, ativo=False).count()
         
         # Aulas de hoje
-        context['aulas_hoje'] = AgendaAula.objects.filter(
+        aulas_hoje_queryset = AgendaAula.objects.filter(
             aluno__personal_trainer=user,
             data_aula=hoje,
             status__in=['agendado', 'confirmado']
         ).order_by('horario_inicio')
+        context['aulas_hoje'] = aulas_hoje_queryset
+        context['treinos_hoje'] = aulas_hoje_queryset.count()  # Para exibir o número
         
         # Próximas aulas (próximos 3 dias)
         proximos_dias = hoje + timedelta(days=3)
@@ -79,14 +81,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         
         # Faturas vencidas
         context['faturas_vencidas'] = Fatura.objects.filter(
-            aluno__personal_trainer=user,
+            contrato__aluno__personal_trainer=user,
             status__in=['pendente', 'parcial'],
             data_vencimento__lt=hoje
         ).count()
         
         # Faturas que vencem hoje
         context['faturas_vencem_hoje'] = Fatura.objects.filter(
-            aluno__personal_trainer=user,
+            contrato__aluno__personal_trainer=user,
             status__in=['pendente', 'parcial'],
             data_vencimento=hoje
         ).count()
@@ -106,15 +108,22 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         mes_atual = hoje.month
         ano_atual = hoje.year
         faturas_mes = Fatura.objects.filter(
-            aluno__personal_trainer=user,
+            contrato__aluno__personal_trainer=user,
             mes_referencia=mes_atual,
             ano_referencia=ano_atual
         )
         context['receita_prevista_mes'] = sum(f.valor_final for f in faturas_mes)
         context['receita_recebida_mes'] = sum(f.valor_final for f in faturas_mes if f.status == 'paga')
+        context['receita_mensal'] = context['receita_recebida_mes']  # Alias para o template
         
-        # Alunos mais ativos (por frequência)
+        # Alunos ativos (count)
         context['alunos_ativos'] = Aluno.objects.filter(
+            personal_trainer=user,
+            ativo=True
+        ).count()
+        
+        # Alunos mais ativos por frequência (para uso em outras partes se necessário)
+        context['alunos_mais_ativos'] = Aluno.objects.filter(
             personal_trainer=user,
             ativo=True
         ).annotate(
