@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gerar Relatório de Progresso{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Cabeçalho -->
+        <div class="mb-8">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'relatorios:lista' %}" class="text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-file-alt mr-2"></i>Relatórios
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mr-2"></i>
+                            <span class="text-gray-500">Gerar Relatório</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-3xl font-bold text-gray-900 mt-4">Gerar Relatório de Progresso</h1>
+            <p class="mt-2 text-gray-600">Configure os parâmetros do relatório que deseja gerar</p>
+        </div>
+
+        <!-- Formulário -->
+        <div class="bg-white rounded-lg shadow">
+            <form method="post" class="p-6 space-y-6">
+                {% csrf_token %}
+                
+                <!-- Informações básicas -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Informações Básicas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.aluno.label }}</label>
+                            {{ form.aluno }}
+                            {% if form.aluno.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.aluno.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.tipo_relatorio.label }}</label>
+                            {{ form.tipo_relatorio }}
+                            {% if form.tipo_relatorio.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.tipo_relatorio.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.titulo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Período -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Período do Relatório</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.periodo.label }}</label>
+                            {{ form.periodo }}
+                            {% if form.periodo.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.periodo.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.data_inicio.label }}</label>
+                            {{ form.data_inicio }}
+                            {% if form.data_inicio.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.data_inicio.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.data_fim.label }}</label>
+                            {{ form.data_fim }}
+                            {% if form.data_fim.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.data_fim.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Atalhos de período -->
+                    <div class="mt-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Atalhos rápidos:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="setPeriod('semanal')" 
+                                    class="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">
+                                Última semana
+                            </button>
+                            <button type="button" onclick="setPeriod('mensal')" 
+                                    class="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">
+                                Último mês
+                            </button>
+                            <button type="button" onclick="setPeriod('trimestral')" 
+                                    class="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200">
+                                Último trimestre
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Observações Adicionais</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.observacoes.label }}</label>
+                        {{ form.observacoes }}
+                        {% if form.observacoes.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">
+                            Adicione comentários ou observações que considera importante incluir no relatório.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Botões de ação -->
+                <div class="flex justify-between pt-6 border-t border-gray-200">
+                    <a href="{% url 'relatorios:lista' %}" 
+                       class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i>Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-cog mr-2"></i>Gerar Relatório
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dicas -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h4 class="text-lg font-medium text-blue-900 mb-2">
+                <i class="fas fa-lightbulb mr-2"></i>Dicas para um bom relatório
+            </h4>
+            <ul class="text-sm text-blue-800 space-y-1">
+                <li>• Escolha um período que tenha dados suficientes de medidas e frequência</li>
+                <li>• Adicione observações relevantes sobre o período (mudanças na dieta, lesões, etc.)</li>
+                <li>• Relatórios mensais geralmente fornecem uma boa visão geral do progresso</li>
+                <li>• Certifique-se de que o aluno tem medidas corporais registradas no período</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+function setPeriod(periodo) {
+    const hoje = new Date();
+    const periodoSelect = document.getElementById('id_periodo');
+    const dataInicio = document.getElementById('id_data_inicio');
+    const dataFim = document.getElementById('id_data_fim');
+    
+    // Definir período
+    periodoSelect.value = periodo;
+    
+    // Definir data fim como hoje
+    dataFim.value = hoje.toISOString().split('T')[0];
+    
+    // Calcular data início baseada no período
+    let diasAtras;
+    switch(periodo) {
+        case 'semanal':
+            diasAtras = 7;
+            break;
+        case 'mensal':
+            diasAtras = 30;
+            break;
+        case 'trimestral':
+            diasAtras = 90;
+            break;
+        default:
+            diasAtras = 30;
+    }
+    
+    const dataInicioCalculada = new Date(hoje);
+    dataInicioCalculada.setDate(hoje.getDate() - diasAtras);
+    dataInicio.value = dataInicioCalculada.toISOString().split('T')[0];
+}
+
+function updateDateFields() {
+    const periodo = document.getElementById('id_periodo').value;
+    if (periodo !== 'personalizado') {
+        setPeriod(periodo);
+    }
+}
+
+// Auto-gerar título baseado no aluno e período
+document.getElementById('id_aluno').addEventListener('change', updateTitulo);
+document.getElementById('id_periodo').addEventListener('change', updateTitulo);
+
+function updateTitulo() {
+    const aluno = document.getElementById('id_aluno');
+    const periodo = document.getElementById('id_periodo');
+    const titulo = document.getElementById('id_titulo');
+    
+    if (aluno.value && periodo.value) {
+        const alunoNome = aluno.options[aluno.selectedIndex].text;
+        const periodoNome = periodo.options[periodo.selectedIndex].text;
+        const agora = new Date();
+        const mes = agora.toLocaleDateString('pt-BR', { month: 'long' });
+        const ano = agora.getFullYear();
+        
+        titulo.value = `Relatório ${periodoNome} - ${alunoNome} - ${mes} ${ano}`;
+    }
+}
+</script>
+{% endblock %}

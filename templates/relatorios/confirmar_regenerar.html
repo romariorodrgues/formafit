@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Regeneração{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Cabeçalho -->
+        <div class="mb-8">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'relatorios:lista' %}" class="text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-file-alt mr-2"></i>Relatórios
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mr-2"></i>
+                            <a href="{% url 'relatorios:detalhe' relatorio.pk %}" class="text-gray-700 hover:text-blue-600">
+                                {{ relatorio.titulo|truncatechars:30 }}
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mr-2"></i>
+                            <span class="text-gray-500">Regenerar</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Card de confirmação -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6">
+                <!-- Ícone e título -->
+                <div class="text-center mb-6">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
+                        <i class="fas fa-redo text-orange-600"></i>
+                    </div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Regenerar Relatório</h3>
+                    <p class="mt-2 text-sm text-gray-500">
+                        Tem certeza que deseja regenerar este relatório?
+                    </p>
+                </div>
+
+                <!-- Informações do relatório -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h4 class="text-sm font-medium text-gray-900 mb-3">Detalhes do Relatório</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Título:</span>
+                            <span class="text-gray-900">{{ relatorio.titulo }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Aluno:</span>
+                            <span class="text-gray-900">{{ relatorio.aluno.nome }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Período:</span>
+                            <span class="text-gray-900">{{ relatorio.data_inicio|date:"d/m/Y" }} - {{ relatorio.data_fim|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Status atual:</span>
+                            <span class="text-gray-900">
+                                {% if relatorio.status == 'erro' %}
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                        Com erro
+                                    </span>
+                                {% elif relatorio.status == 'concluido' %}
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        Concluído
+                                    </span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aviso importante -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">Atenção</h3>
+                            <div class="mt-2 text-sm text-yellow-700">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>O relatório atual será substituído pela nova versão</li>
+                                    <li>Todos os dados serão recalculados com base no período especificado</li>
+                                    <li>Este processo pode levar alguns minutos para ser concluído</li>
+                                    <li>Você receberá uma notificação quando a regeneração estiver pronta</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de ação -->
+                <div class="flex justify-between">
+                    <a href="{% url 'relatorios:detalhe' relatorio.pk %}" 
+                       class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i>Cancelar
+                    </a>
+                    
+                    <form method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="px-6 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                            <i class="fas fa-redo mr-2"></i>Confirmar Regeneração
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações adicionais -->
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500">
+                Precisa de ajuda? 
+                <a href="#" class="text-blue-600 hover:text-blue-700">Entre em contato com o suporte</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

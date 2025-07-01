@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Relatórios{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Cabeçalho -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard de Relatórios</h1>
+                <p class="mt-2 text-gray-600">Acompanhe as estatísticas dos seus relatórios de progresso</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'relatorios:lista' %}" 
+                   class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-list mr-2"></i>Ver Lista
+                </a>
+                <a href="{% url 'relatorios:gerar' %}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Novo Relatório
+                </a>
+            </div>
+        </div>
+
+        <!-- Estatísticas principais -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <i class="fas fa-file-alt text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total de Relatórios</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_relatorios }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <i class="fas fa-calendar text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Este Mês</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ relatorios_mes }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 bg-purple-100 rounded-full">
+                        <i class="fas fa-check-circle text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Concluídos</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats_status.concluido.count }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="p-3 bg-orange-100 rounded-full">
+                        <i class="fas fa-clock text-orange-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Em Processamento</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats_status.gerando.count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos e estatísticas -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Status dos relatórios -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Relatórios por Status</h3>
+                <div class="space-y-4">
+                    {% for status, data in stats_status.items %}
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            {% if status == 'concluido' %}
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                            {% elif status == 'gerando' %}
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                            {% elif status == 'erro' %}
+                                <div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                            {% else %}
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                            {% endif %}
+                            <span class="text-sm font-medium text-gray-900">{{ data.label }}</span>
+                        </div>
+                        <span class="text-sm text-gray-600">{{ data.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Tipos de relatório -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Relatórios por Período</h3>
+                <div class="space-y-4">
+                    {% for periodo, data in stats_periodo.items %}
+                    {% if data.count > 0 %}
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                            <span class="text-sm font-medium text-gray-900">{{ data.label }}</span>
+                        </div>
+                        <span class="text-sm text-gray-600">{{ data.count }}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabelas de dados -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Top alunos -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Alunos com Mais Relatórios</h3>
+                {% if alunos_top %}
+                <div class="space-y-4">
+                    {% for aluno in alunos_top %}
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-sm font-medium text-gray-700">
+                                    {{ aluno.aluno__nome|slice:":1" }}
+                                </span>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">{{ aluno.aluno__nome }}</span>
+                        </div>
+                        <span class="text-sm text-gray-600">{{ aluno.total }} relatório{{ aluno.total|pluralize:"s" }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500 text-center py-4">Nenhum dado disponível ainda</p>
+                {% endif %}
+            </div>
+
+            <!-- Últimos relatórios -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Últimos Relatórios</h3>
+                {% if ultimos_relatorios %}
+                <div class="space-y-4">
+                    {% for relatorio in ultimos_relatorios %}
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ relatorio.titulo|truncatechars:30 }}</p>
+                            <p class="text-xs text-gray-500">{{ relatorio.aluno.nome }} • {{ relatorio.data_geracao|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            {% if relatorio.status == 'concluido' %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    Concluído
+                                </span>
+                            {% elif relatorio.status == 'gerando' %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Gerando
+                                </span>
+                            {% elif relatorio.status == 'erro' %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    Erro
+                                </span>
+                            {% endif %}
+                            <a href="{% url 'relatorios:detalhe' relatorio.pk %}" 
+                               class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-eye text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500 text-center py-4">Nenhum relatório gerado ainda</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Dicas e sugestões -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h4 class="text-lg font-medium text-blue-900 mb-2">
+                <i class="fas fa-lightbulb mr-2"></i>Dicas para maximizar o uso dos relatórios
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+                <ul class="space-y-1">
+                    <li>• Gere relatórios mensais para acompanhamento regular</li>
+                    <li>• Use observações para contextualizar os resultados</li>
+                    <li>• Compartilhe os relatórios com seus alunos regularmente</li>
+                </ul>
+                <ul class="space-y-1">
+                    <li>• Analise tendências de progresso ao longo do tempo</li>
+                    <li>• Use os dados para ajustar planos de treino</li>
+                    <li>• Mantenha registros regulares de medidas corporais</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

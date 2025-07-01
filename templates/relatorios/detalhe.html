@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ relatorio.titulo }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Cabeçalho -->
+        <div class="mb-8">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'relatorios:lista' %}" class="text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-file-alt mr-2"></i>Relatórios
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mr-2"></i>
+                            <span class="text-gray-500">{{ relatorio.titulo|truncatechars:30 }}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="flex justify-between items-start mt-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ relatorio.titulo }}</h1>
+                    <p class="mt-2 text-gray-600">{{ relatorio.aluno.nome }} • {{ relatorio.data_inicio|date:"d/m/Y" }} a {{ relatorio.data_fim|date:"d/m/Y" }}</p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    {% if relatorio.status == 'concluido' and relatorio.arquivo_pdf %}
+                        <a href="{% url 'relatorios:download' relatorio.pk %}" 
+                           class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Download PDF
+                        </a>
+                    {% endif %}
+                    
+                    {% if pode_regenerar %}
+                        <a href="{% url 'relatorios:regenerar' relatorio.pk %}" 
+                           class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+                            <i class="fas fa-redo mr-2"></i>Regenerar
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'relatorios:enviar_email' relatorio.pk %}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-envelope mr-2"></i>Enviar por Email
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status do relatório -->
+        <div class="mb-8">
+            {% if relatorio.status == 'gerando' %}
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-spinner fa-spin text-yellow-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-yellow-800">Gerando relatório...</h3>
+                            <p class="text-sm text-yellow-700 mt-1">
+                                O relatório está sendo processado. Esta página será atualizada automaticamente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% elif relatorio.status == 'erro' %}
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-red-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-red-800">Erro na geração</h3>
+                            <p class="text-sm text-red-700 mt-1">
+                                Ocorreu um erro ao gerar o relatório. Tente regenerar ou entre em contato com o suporte.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% elif relatorio.status == 'concluido' %}
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                        <div>
+                            <h3 class="text-sm font-medium text-green-800">Relatório concluído</h3>
+                            <p class="text-sm text-green-700 mt-1">
+                                O relatório foi gerado com sucesso em {{ relatorio.data_atualizacao|date:"d/m/Y às H:i" }}.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Informações do relatório -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Coluna principal -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Resumo executivo -->
+                {% if relatorio.status == 'concluido' %}
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Resumo Executivo</h3>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <p class="text-2xl font-bold text-blue-600">{{ relatorio.total_treinos }}</p>
+                            <p class="text-sm text-gray-600">Treinos</p>
+                        </div>
+                        
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <p class="text-2xl font-bold text-green-600">{{ relatorio.percentual_frequencia|floatformat:1 }}%</p>
+                            <p class="text-sm text-gray-600">Frequência</p>
+                        </div>
+                        
+                        {% if relatorio.peso_inicial and relatorio.peso_final %}
+                        <div class="text-center p-4 bg-purple-50 rounded-lg">
+                            <p class="text-2xl font-bold text-purple-600">{{ relatorio.peso_inicial }}kg</p>
+                            <p class="text-sm text-gray-600">Peso Inicial</p>
+                        </div>
+                        
+                        <div class="text-center p-4 bg-orange-50 rounded-lg">
+                            <p class="text-2xl font-bold text-orange-600">{{ relatorio.peso_final }}kg</p>
+                            <p class="text-sm text-gray-600">Peso Final</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if relatorio.diferenca_peso %}
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <p class="text-lg font-medium text-gray-900">Evolução do Peso</p>
+                        {% if relatorio.diferenca_peso > 0 %}
+                            <p class="text-2xl font-bold text-green-600">+{{ relatorio.diferenca_peso }}kg</p>
+                            <p class="text-sm text-green-600">Ganho de peso</p>
+                        {% elif relatorio.diferenca_peso < 0 %}
+                            <p class="text-2xl font-bold text-red-600">{{ relatorio.diferenca_peso }}kg</p>
+                            <p class="text-sm text-red-600">Perda de peso</p>
+                        {% else %}
+                            <p class="text-2xl font-bold text-gray-600">0kg</p>
+                            <p class="text-sm text-gray-600">Peso mantido</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Observações -->
+                {% if relatorio.observacoes %}
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Observações</h3>
+                    <div class="prose max-w-none">
+                        <p class="text-gray-700">{{ relatorio.observacoes|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Preview do PDF (se disponível) -->
+                {% if relatorio.arquivo_pdf %}
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Preview do Relatório</h3>
+                    <div class="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                        <i class="fas fa-file-pdf text-4xl text-red-500 mb-4"></i>
+                        <p class="text-gray-600 mb-4">Relatório PDF gerado</p>
+                        <a href="{% url 'relatorios:download' relatorio.pk %}" 
+                           class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Visualizar PDF
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Informações do aluno -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Informações do Aluno</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Nome:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.aluno.nome }}</span>
+                        </div>
+                        {% if relatorio.aluno.idade %}
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Idade:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.aluno.idade }} anos</span>
+                        </div>
+                        {% endif %}
+                        {% if relatorio.aluno.altura %}
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Altura:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.aluno.altura }} m</span>
+                        </div>
+                        {% endif %}
+                        {% if relatorio.aluno.objetivo %}
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Objetivo:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.aluno.get_objetivo_display }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Detalhes do relatório -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Detalhes do Relatório</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Tipo:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.tipo_relatorio.nome }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Período:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.get_periodo_display }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Gerado em:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.data_geracao|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        {% if relatorio.data_atualizacao != relatorio.data_geracao %}
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Atualizado em:</span>
+                            <span class="text-sm font-medium text-gray-900">{{ relatorio.data_atualizacao|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Ações rápidas -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Ações Rápidas</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'alunos:lista' %}" 
+                           class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-users mr-2 text-gray-400"></i>Ver Alunos
+                        </a>
+                        <a href="{% url 'relatorios:gerar' %}" 
+                           class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-plus mr-2 text-gray-400"></i>Novo Relatório
+                        </a>
+                        <a href="{% url 'relatorios:dashboard' %}" 
+                           class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-chart-line mr-2 text-gray-400"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if relatorio.status == 'gerando' %}
+<script>
+// Verificar status do relatório a cada 3 segundos
+function checkStatus() {
+    fetch(`/relatorios/ajax/{{ relatorio.pk }}/status/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'gerando') {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Erro ao verificar status:', error));
+}
+
+setInterval(checkStatus, 3000);
+</script>
+{% endif %}
+{% endblock %}
