@@ -69,25 +69,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'formafit.wsgi.application'
 
-# Database configuration - SQLite para desenvolvimento inicial
+# Database configuration - PostgreSQL para desenvolvimento e produção
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DATABASE_NAME', default='formafit_db'),
+        'USER': config('DATABASE_USER', default='formafit_user'),
+        'PASSWORD': config('DATABASE_PASSWORD', default='formafit123'),
+        'HOST': config('DATABASE_HOST', default='localhost'),
+        'PORT': config('DATABASE_PORT', default='5432'),
     }
 }
 
-# Para PostgreSQL (descomente quando configurar):
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DATABASE_NAME'),
-#         'USER': config('DATABASE_USER'),
-#         'PASSWORD': config('DATABASE_PASSWORD'),
-#         'HOST': config('DATABASE_HOST'),
-#         'PORT': config('DATABASE_PORT'),
-#     }
-# }
+# Fallback para SQLite se PostgreSQL não estiver disponível (apenas para testes)
+# Para usar SQLite, defina USE_SQLITE=True no .env
+if config('USE_SQLITE', default=False, cast=bool):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

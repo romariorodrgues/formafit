@@ -85,8 +85,8 @@ O FormaFit foi desenvolvido para resolver os principais desafios dos personal tr
 ### **Backend**
 - **Python 3.9+** - Linguagem principal
 - **Django 4.2** - Framework web robusto e escalável
-- **PostgreSQL** - Banco de dados (produção)
-- **SQLite** - Banco de dados (desenvolvimento)
+- **PostgreSQL** - Banco de dados principal (desenvolvimento e produção)
+- **SQLite** - Banco de dados alternativo (apenas para testes rápidos)
 - **Django Rest Framework** - APIs RESTful (futuro)
 
 ### **Frontend**
@@ -119,64 +119,68 @@ O FormaFit foi desenvolvido para resolver os principais desafios dos personal tr
 
 ### **🛠️ Instalação Local (Desenvolvimento)**
 
-#### **1. Clone o Repositório**
+#### **🎯 OPÇÃO 1: PostgreSQL (Recomendado)**
+
+**Configure PostgreSQL para desenvolvimento igual à produção:**
+
 ```bash
+# 1. Clone o repositório
 git clone https://github.com/romariorodrgues/formafit.git
 cd FormaFit
-```
 
-#### **2. Crie e Ative o Ambiente Virtual**
-```bash
-# Criar ambiente virtual
+# 2. Crie e ative o ambiente virtual
 python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou: venv\Scripts\activate  # Windows
 
-# Ativar no Linux/Mac
-source venv/bin/activate
-
-# Ativar no Windows
-venv\Scripts\activate
-```
-
-#### **3. Instale as Dependências**
-```bash
+# 3. Instale dependências
 pip install -r requirements.txt
-```
 
-#### **4. Configure as Variáveis de Ambiente**
-Crie um arquivo `.env` na raiz do projeto:
-```env
-# Configurações Básicas
-SECRET_KEY=sua-chave-secreta-muito-segura-aqui
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+# 4. Configure PostgreSQL automaticamente
+./setup_postgresql.sh
 
-# Banco de Dados (desenvolvimento com SQLite)
-DATABASE_URL=sqlite:///db.sqlite3
-
-# API ChatPro (opcional para desenvolvimento)
-CHATPRO_API_KEY=sua-chave-api-chatpro
-CHATPRO_API_URL=https://api.chatpro.com.br
-
-# Email (opcional para desenvolvimento)
-EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-```
-
-#### **5. Execute as Migrações**
-```bash
-python manage.py migrate
-```
-
-#### **6. Crie um Superusuário**
-```bash
+# 5. Finalize a instalação
+python manage.py migrate --fake-initial
 python manage.py createsuperuser
-```
-
-#### **7. Execute o Servidor de Desenvolvimento**
-```bash
+python criar_dados_notificacoes.py
 python manage.py runserver
 ```
 
-Acesse: `http://localhost:8000`
+> 📖 **Documentação completa**: Veja [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md) para instruções detalhadas
+
+#### **🎯 OPÇÃO 2: SQLite (Fallback)**
+
+**Para testes rápidos sem PostgreSQL:**
+
+```bash
+# 1-3. Mesmo processo acima até dependências
+
+# 4. Configure para SQLite
+cp .env.example .env
+echo "USE_SQLITE=True" >> .env
+
+# 5. Execute migrações
+python manage.py migrate
+
+# 6. Crie superusuário
+python manage.py createsuperuser
+
+# 7. Execute servidor
+python manage.py runserver
+```
+
+#### **📦 Arquivo SQL Pronto**
+
+O projeto inclui `database_schema.sql` com a estrutura completa do PostgreSQL:
+- ✅ Todas as tabelas Django e FormaFit
+- ✅ Índices e relacionamentos
+- ✅ Configurações otimizadas
+- ✅ Dados iniciais mínimos
+
+**Para importar em qualquer PostgreSQL:**
+```bash
+psql -U formafit_user -d formafit_db -f database_schema.sql
+```
 
 ## 🔑 **Dados de Acesso para Teste**
 
