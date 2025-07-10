@@ -75,8 +75,23 @@ class AlunoCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.personal_trainer = self.request.user
-        messages.success(self.request, f'Aluno {form.instance.nome} cadastrado com sucesso!')
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # Criar agendamentos automáticos se dia e horário foram definidos
+        if form.instance.dia_semana_treino is not None and form.instance.horario_treino:
+            agendamentos_criados = form.instance.criar_agendamentos_automaticos()
+            if agendamentos_criados:
+                messages.success(
+                    self.request, 
+                    f'Aluno {form.instance.nome} cadastrado com sucesso! '
+                    f'{len(agendamentos_criados)} agendamentos criados automaticamente.'
+                )
+            else:
+                messages.success(self.request, f'Aluno {form.instance.nome} cadastrado com sucesso!')
+        else:
+            messages.success(self.request, f'Aluno {form.instance.nome} cadastrado com sucesso!')
+        
+        return response
 
 
 class AlunoUpdateView(LoginRequiredMixin, UpdateView):
@@ -94,8 +109,30 @@ class AlunoUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('alunos:detalhes', kwargs={'pk': self.object.pk})
     
     def form_valid(self, form):
-        messages.success(self.request, f'Dados de {form.instance.nome} atualizados com sucesso!')
-        return super().form_valid(form)
+        # Verificar se o agendamento padrão foi alterado
+        old_dia = self.get_object().dia_semana_treino
+        old_horario = self.get_object().horario_treino
+        
+        response = super().form_valid(form)
+        
+        # Se o agendamento foi alterado e agora está definido, criar novos agendamentos
+        if (form.instance.dia_semana_treino != old_dia or form.instance.horario_treino != old_horario):
+            if form.instance.dia_semana_treino is not None and form.instance.horario_treino:
+                agendamentos_criados = form.instance.criar_agendamentos_automaticos()
+                if agendamentos_criados:
+                    messages.success(
+                        self.request, 
+                        f'Dados de {form.instance.nome} atualizados com sucesso! '
+                        f'{len(agendamentos_criados)} novos agendamentos criados automaticamente.'
+                    )
+                else:
+                    messages.success(self.request, f'Dados de {form.instance.nome} atualizados com sucesso!')
+            else:
+                messages.success(self.request, f'Dados de {form.instance.nome} atualizados com sucesso!')
+        else:
+            messages.success(self.request, f'Dados de {form.instance.nome} atualizados com sucesso!')
+        
+        return response
 
 
 class AlunoDetailView(LoginRequiredMixin, DetailView):
@@ -125,8 +162,8 @@ class AlunoDetailView(LoginRequiredMixin, DetailView):
         from frequencia.models import RegistroPresenca
         context['presencas_mes'] = RegistroPresenca.objects.filter(
             aluno=aluno,
-            data_presenca__gte=mes_passado,
-            presente=True
+            data_aula__gte=mes_passado,
+            status='presente'
         ).count()
         
         # Plano de treino atual
@@ -265,12 +302,16 @@ def estatisticas_aluno(request, pk):
     
     # Frequência mensal
     from frequencia.models import RegistroPresenca
+    from django.db.models import Count
+    from django.db.models.functions import Extract
+    
     frequencia_mensal = RegistroPresenca.objects.filter(
         aluno=aluno,
-        presente=True
-    ).extra(
-        select={'mes': "DATE_FORMAT(data_presenca, '%%Y-%%m')"}
-    ).values('mes').annotate(total=Count('id')).order_by('mes')
+        status='presente'
+    ).annotate(
+        ano=Extract('data_aula', 'year'),
+        mes=Extract('data_aula', 'month')
+    ).values('ano', 'mes').annotate(total=Count('id')).order_by('ano', 'mes')
     
     context = {
         'aluno': aluno,

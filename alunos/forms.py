@@ -21,12 +21,28 @@ class AlunoForm(forms.ModelForm):
         })
     )
     
+    dia_semana_treino = forms.ChoiceField(
+        choices=[('', 'Selecione um dia')] + Aluno.DIAS_SEMANA_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+        })
+    )
+    
+    horario_treino = forms.TimeField(
+        required=False,
+        widget=forms.TimeInput(attrs={
+            'type': 'time',
+            'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+        })
+    )
+    
     class Meta:
         model = Aluno
         fields = [
             'nome', 'email', 'telefone', 'data_nascimento',
             'sexo', 'altura', 'peso_inicial', 'objetivo',
-            'observacoes', 'endereco', 'ativo'
+            'observacoes', 'dia_semana_treino', 'horario_treino', 'ativo'
         ]
         widgets = {
             'nome': forms.TextInput(attrs={
@@ -58,18 +74,11 @@ class AlunoForm(forms.ModelForm):
                 'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
                 'placeholder': 'Ex: 70.5'
             }),
-            'objetivo': forms.Textarea(attrs={
-                'rows': 3,
-                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                'placeholder': 'Descreva os objetivos do aluno...'
+            'objetivo': forms.Select(attrs={
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
             }),
             'nivel_atividade': forms.Select(attrs={
                 'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-            }),
-            'endereco': forms.Textarea(attrs={
-                'rows': 2,
-                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                'placeholder': 'Endereço completo...'
             }),
             'observacoes': forms.Textarea(attrs={
                 'rows': 3,
@@ -80,6 +89,19 @@ class AlunoForm(forms.ModelForm):
                 'class': 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded'
             })
         }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        dia_semana = cleaned_data.get('dia_semana_treino')
+        horario = cleaned_data.get('horario_treino')
+        
+        # Se um campo foi preenchido, o outro também deve ser
+        if dia_semana and not horario:
+            raise forms.ValidationError('Se você definir um dia da semana, também deve definir um horário.')
+        elif horario and not dia_semana:
+            raise forms.ValidationError('Se você definir um horário, também deve definir um dia da semana.')
+        
+        return cleaned_data
 
 
 class MedidasCorporaisForm(forms.ModelForm):

@@ -62,12 +62,12 @@
                 <!-- Valores -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="{{ form.valor_base.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            Valor Base (R$) *
+                        <label for="{{ form.valor_original.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Valor Original (R$) *
                         </label>
-                        {{ form.valor_base }}
-                        {% if form.valor_base.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.valor_base.errors.0 }}</p>
+                        {{ form.valor_original }}
+                        {% if form.valor_original.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.valor_original.errors.0 }}</p>
                         {% endif %}
                     </div>
                     
@@ -94,12 +94,12 @@
                     </div>
                     
                     <div>
-                        <label for="{{ form.multa.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            Multa (R$)
+                        <label for="{{ form.acrescimo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Acréscimo/Multa (R$)
                         </label>
-                        {{ form.multa }}
-                        {% if form.multa.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ form.multa.errors.0 }}</p>
+                        {{ form.acrescimo }}
+                        {% if form.acrescimo.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.acrescimo.errors.0 }}</p>
                         {% endif %}
                     </div>
                 </div>
@@ -136,14 +136,57 @@
                 <div>
                     <h4 class="text-sm font-medium text-blue-900">Dica:</h4>
                     <p class="text-sm text-blue-700 mt-1">
-                        O valor final da fatura será calculado automaticamente: Valor Base - Desconto + Multa.
-                        Certifique-se de que o aluno possui um contrato ativo antes de criar a fatura.
+                        O valor final da fatura será calculado automaticamente: Valor Original - Desconto + Acréscimo.
+                        Ao selecionar o aluno, o valor será preenchido automaticamente baseado no contrato.
                     </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const alunoSelect = document.getElementById('{{ form.aluno.id_for_label }}');
+    const valorOriginalInput = document.getElementById('{{ form.valor_original.id_for_label }}');
+    const dataVencimentoInput = document.getElementById('{{ form.data_vencimento.id_for_label }}');
+    const mesSelect = document.getElementById('{{ form.mes_referencia.id_for_label }}');
+    const anoInput = document.getElementById('{{ form.ano_referencia.id_for_label }}');
+    
+    if (alunoSelect && valorOriginalInput) {
+        alunoSelect.addEventListener('change', function() {
+            const alunoId = this.value;
+            
+            if (alunoId) {
+                // Fazer requisição AJAX para obter o valor do contrato
+                fetch(`{% url 'financeiro:obter_valor_contrato' %}?aluno_id=${alunoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.valor) {
+                            valorOriginalInput.value = data.valor;
+                            
+                            // Calcular data de vencimento baseada no dia do contrato
+                            if (data.dia_vencimento && dataVencimentoInput && mesSelect && anoInput) {
+                                const mesRef = parseInt(mesSelect.value) || new Date().getMonth() + 1;
+                                const anoRef = parseInt(anoInput.value) || new Date().getFullYear();
+                                
+                                const dataVenc = new Date(anoRef, mesRef - 1, data.dia_vencimento);
+                                const dataFormatada = dataVenc.toISOString().split('T')[0];
+                                dataVencimentoInput.value = dataFormatada;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar valor do contrato:', error);
+                    });
+            } else {
+                valorOriginalInput.value = '';
+                dataVencimentoInput.value = '';
+            }
+        });
+    }
+});
+</script>
 
 <style>
 .form-control {

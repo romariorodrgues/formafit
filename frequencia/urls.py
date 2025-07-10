@@ -17,7 +17,9 @@ urlpatterns = [
     # Agendamentos
     path('agenda/', views.AgendaListView.as_view(), name='agenda'),
     path('agenda/nova/', views.AgendaCreateView.as_view(), name='agendar_aula'),
+    path('agenda/<int:pk>/editar/', views.AgendaUpdateView.as_view(), name='editar_agenda'),
     path('agenda/<int:agenda_id>/status/', views.alterar_status_agenda, name='alterar_status'),
+    path('agenda/<int:agenda_id>/status/ajax/', views.alterar_status_agenda_ajax, name='alterar_status_ajax'),
     
     # Calendário
     path('calendario/', views.calendario_mensal, name='calendario'),

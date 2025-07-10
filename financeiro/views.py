@@ -630,3 +630,29 @@ def ajax_dados_grafico_receita(request):
         })
     
     return JsonResponse(dados, safe=False)
+
+
+@login_required
+def obter_valor_contrato(request):
+    """Obter valor do contrato do aluno para AJAX."""
+    if request.method == 'GET':
+        aluno_id = request.GET.get('aluno_id')
+        if aluno_id:
+            try:
+                aluno = Aluno.objects.get(
+                    id=aluno_id,
+                    personal_trainer=request.user
+                )
+                contrato = ContratoAluno.objects.get(
+                    aluno=aluno,
+                    ativo=True
+                )
+                return JsonResponse({
+                    'valor': str(contrato.valor_mensalidade),
+                    'plano': contrato.plano_mensalidade.nome,
+                    'dia_vencimento': contrato.dia_vencimento
+                })
+            except (Aluno.DoesNotExist, ContratoAluno.DoesNotExist):
+                return JsonResponse({'error': 'Aluno ou contrato não encontrado'}, status=404)
+    
+    return JsonResponse({'error': 'Método não permitido'}, status=405)

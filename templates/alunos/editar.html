@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Cadastrar Aluno - FormaFit{% endblock %}
+{% block title %}Editar Aluno - FormaFit{% endblock %}
 
 {% block content %}
 <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-center">
-            <a href="{% url 'alunos:lista' %}" class="mr-4 text-gray-400 hover:text-gray-600">
+            <a href="{% url 'alunos:detalhes' object.pk %}" class="mr-4 text-gray-400 hover:text-gray-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Cadastrar Novo Aluno</h1>
-                <p class="mt-2 text-gray-600">Preencha as informações básicas do aluno</p>
+                <h1 class="text-3xl font-bold text-gray-900">Editar Aluno</h1>
+                <p class="mt-2 text-gray-600">Atualize as informações de {{ object.nome }}</p>
             </div>
         </div>
     </div>
@@ -71,10 +71,10 @@
                 </div>
             </div>
 
-            <!-- Dados Físicos -->
+            <!-- Medidas Corporais -->
             <div class="pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Dados Físicos</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Medidas Corporais</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="{{ form.altura.id_for_label }}" class="block text-sm font-medium text-gray-700">Altura (m) *</label>
                         {{ form.altura }}
@@ -106,7 +106,7 @@
                     </div>
 
                     <div>
-                        <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">Observações Gerais</label>
+                        <label for="{{ form.observacoes.id_for_label }}" class="block text-sm font-medium text-gray-700">Observações Médicas e Restrições</label>
                         {{ form.observacoes }}
                         {% if form.observacoes.errors %}
                             <p class="mt-1 text-sm text-red-600">{{ form.observacoes.errors.0 }}</p>
@@ -127,7 +127,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-blue-700">
-                                <strong>Funcionalidade Automática:</strong> Ao definir um dia da semana e horário fixo, o sistema criará automaticamente os agendamentos das próximas 4 semanas na Agenda de Aulas, facilitando o controle da frequência.
+                                <strong>Alteração de Agendamento:</strong> Se você alterar o dia ou horário, novos agendamentos serão criados automaticamente para as próximas semanas.
                             </p>
                         </div>
                     </div>
@@ -155,84 +155,49 @@
             <div class="pt-6 border-t border-gray-200">
                 <div class="flex items-center">
                     {{ form.ativo }}
-                    <label for="{{ form.ativo.id_for_label }}" class="ml-2 block text-sm text-gray-900">
-                        Aluno ativo (marque para ativar imediatamente)
-                    </label>
+                    <label for="{{ form.ativo.id_for_label }}" class="ml-2 text-sm font-medium text-gray-700">Aluno Ativo</label>
                 </div>
-                {% if form.ativo.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.ativo.errors.0 }}</p>
-                {% endif %}
             </div>
 
-            <!-- Erros gerais do formulário -->
-            {% if form.non_field_errors %}
-                <div class="rounded-md bg-red-50 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-red-800">
-                                {% for error in form.non_field_errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
             <!-- Botões -->
-            <div class="pt-6 border-t border-gray-200 flex justify-end space-x-3">
-                <a href="{% url 'alunos:lista' %}" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'alunos:detalhes' object.pk %}" 
+                   class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Cancelar
                 </a>
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Cadastrar Aluno
+                <button type="submit" 
+                        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-save mr-2"></i>Salvar Alterações
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<script>
-// Máscara para telefone
-document.addEventListener('DOMContentLoaded', function() {
-    const telefoneInput = document.getElementById('{{ form.telefone.id_for_label }}');
-    
-    if (telefoneInput) {
-        telefoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            
-            if (value.length <= 11) {
-                value = value.replace(/(\d{2})(\d)/, '($1) $2');
-                value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
-            }
-            
-            e.target.value = value;
-        });
+<style>
+/* Estilização personalizada para os campos do formulário */
+select, input[type="email"], input[type="text"], input[type="tel"], input[type="date"], input[type="number"], textarea {
+    @apply w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+}
+
+textarea {
+    @apply resize-none;
+    min-height: 100px;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row > div {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
     }
-    
-    // Auto-calcular IMC quando peso e altura forem preenchidos
-    const pesoInput = document.getElementById('{{ form.peso_inicial.id_for_label }}');
-    const alturaInput = document.getElementById('{{ form.altura.id_for_label }}');
-    
-    function calcularIMC() {
-        const peso = parseFloat(pesoInput.value);
-        const altura = parseFloat(alturaInput.value);
-        
-        if (peso && altura) {
-            const imc = peso / (altura * altura);
-            console.log('IMC calculado:', imc.toFixed(1));
-        }
-    }
-    
-    if (pesoInput && alturaInput) {
-        pesoInput.addEventListener('blur', calcularIMC);
-        alturaInput.addEventListener('blur', calcularIMC);
-    }
-});
-</script>
+}
+</style>
 {% endblock %}

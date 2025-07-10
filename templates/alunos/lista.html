@@ -163,7 +163,7 @@
                                     </div>
                                     {% if aluno.objetivo %}
                                     <div class="mt-2">
-                                        <p class="text-sm text-gray-600">{{ aluno.objetivo|truncatechars:100 }}</p>
+                                        <p class="text-sm text-gray-600">{{ aluno.get_objetivo_display }}</p>
                                     </div>
                                     {% endif %}
                                 </div>

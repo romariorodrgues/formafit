@@ -15,6 +15,7 @@ urlpatterns = [
     path('faturas/<int:pk>/', views.fatura_detail, name='fatura_detail'),
     path('faturas/criar/', views.criar_fatura, name='criar_fatura'),
     path('faturas/gerar-automaticas/', views.gerar_faturas_automaticas, name='gerar_faturas_automaticas'),
+    path('faturas/obter-valor-contrato/', views.obter_valor_contrato, name='obter_valor_contrato'),
     
     # Pagamentos
     path('faturas/<int:fatura_id>/pagar/', views.registrar_pagamento, name='registrar_pagamento'),

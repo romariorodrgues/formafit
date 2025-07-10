@@ -11,20 +11,25 @@ class Aluno(models.Model):
     Modelo para representar um aluno do personal trainer.
     """
     OBJETIVO_CHOICES = [
+        ('saude_geral', 'Melhorar saúde geral'),
         ('emagrecimento', 'Emagrecimento'),
-        ('ganho_peso', 'Ganho de Peso'),
         ('hipertrofia', 'Hipertrofia'),
-        ('definicao', 'Definição'),
-        ('resistencia', 'Resistência'),
-        ('reabilitacao', 'Reabilitação'),
-        ('condicionamento', 'Condicionamento Físico'),
-        ('outro', 'Outro'),
     ]
     
     SEXO_CHOICES = [
         ('M', 'Masculino'),
         ('F', 'Feminino'),
         ('O', 'Outro'),
+    ]
+    
+    DIAS_SEMANA_CHOICES = [
+        (0, 'Segunda-feira'),
+        (1, 'Terça-feira'),
+        (2, 'Quarta-feira'),
+        (3, 'Quinta-feira'),
+        (4, 'Sexta-feira'),
+        (5, 'Sábado'),
+        (6, 'Domingo'),
     ]
     
     # Dados pessoais
@@ -42,6 +47,10 @@ class Aluno(models.Model):
     # Objetivos e observações
     objetivo = models.CharField(max_length=20, choices=OBJETIVO_CHOICES)
     observacoes = models.TextField(blank=True, help_text="Observações gerais, histórico médico, etc.")
+    
+    # Agendamento padrão
+    dia_semana_treino = models.IntegerField(choices=DIAS_SEMANA_CHOICES, blank=True, null=True, help_text="Dia da semana fixo para treino")
+    horario_treino = models.TimeField(blank=True, null=True, help_text="Horário fixo para treino")
     
     # Relacionamento com personal trainer
     personal_trainer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='alunos')
@@ -75,6 +84,65 @@ class Aluno(models.Model):
         if self.peso_inicial and self.altura:
             return float(self.peso_inicial) / (float(self.altura) ** 2)
         return None
+    
+    def get_proximo_treino(self):
+        """Retorna a próxima data de treino baseada no agendamento padrão."""
+        if self.dia_semana_treino is not None and self.horario_treino:
+            from datetime import datetime, timedelta
+            hoje = timezone.now().date()
+            dias_ate_treino = (self.dia_semana_treino - hoje.weekday()) % 7
+            if dias_ate_treino == 0:
+                # Se é hoje, verifica se o horário já passou
+                agora = timezone.now().time()
+                if agora > self.horario_treino:
+                    dias_ate_treino = 7
+            proxima_data = hoje + timedelta(days=dias_ate_treino)
+            return proxima_data
+        return None
+    
+    def criar_agendamentos_automaticos(self, semanas=4):
+        """Cria agendamentos automáticos para as próximas semanas."""
+        if self.dia_semana_treino is not None and self.horario_treino:
+            from datetime import timedelta
+            from frequencia.models import AgendaAula
+            
+            proxima_data = self.get_proximo_treino()
+            if proxima_data:
+                agendamentos_criados = []
+                for i in range(semanas):
+                    data_treino = proxima_data + timedelta(weeks=i)
+                    
+                    # Verifica se já existe agendamento para esta data
+                    if not AgendaAula.objects.filter(
+                        aluno=self,
+                        data_aula=data_treino,
+                        horario_inicio=self.horario_treino
+                    ).exists():
+                        # Calcula horário de fim (1 hora de duração padrão)
+                        from datetime import datetime, timedelta
+                        horario_inicio = self.horario_treino
+                        if isinstance(horario_inicio, str):
+                            from datetime import time
+                            hora, minuto = map(int, horario_inicio.split(':'))
+                            horario_inicio = time(hora, minuto)
+                        
+                        horario_fim = (
+                            datetime.combine(data_treino, horario_inicio) + 
+                            timedelta(hours=1)
+                        ).time()
+                        
+                        agendamento = AgendaAula.objects.create(
+                            aluno=self,
+                            data_aula=data_treino,
+                            horario_inicio=horario_inicio,
+                            horario_fim=horario_fim,
+                            status='agendado',
+                            tipo_treino='Treino Regular'
+                        )
+                        agendamentos_criados.append(agendamento)
+                
+                return agendamentos_criados
+        return []
 
 
 class MedidasCorporais(models.Model):

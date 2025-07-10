@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 import calendar
 
 from .models import RegistroPresenca, AgendaAula, RelatorioFrequencia
-from .forms import RegistroPresencaForm, AgendaAulaForm, FiltroFrequenciaForm, AgendaStatusForm
+from .forms import RegistroPresencaForm, AgendaAulaForm, FiltroFrequenciaForm, AgendaStatusForm, AgendaEditForm
 from alunos.models import Aluno
 
 
@@ -161,6 +161,44 @@ class AgendaCreateView(LoginRequiredMixin, CreateView):
         return form
 
 
+class AgendaUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Editar agendamento de aula.
+    """
+    model = AgendaAula
+    form_class = AgendaEditForm
+    template_name = 'frequencia/editar_aula.html'
+    success_url = reverse_lazy('frequencia:agenda')
+    
+    def get_queryset(self):
+        # Apenas agendamentos do personal trainer logado
+        return AgendaAula.objects.filter(
+            aluno__personal_trainer=self.request.user
+        )
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Filtrar apenas alunos do personal trainer logado
+        form.fields['aluno'].queryset = Aluno.objects.filter(
+            personal_trainer=self.request.user
+        )
+        return form
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Aula editada com sucesso!')
+        return super().form_valid(form)
+        return super().form_valid(form)
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Filtrar apenas alunos do personal trainer logado
+        form.fields['aluno'].queryset = Aluno.objects.filter(
+            personal_trainer=self.request.user,
+            ativo=True
+        )
+        return form
+
+
 @login_required
 def alterar_status_agenda(request, agenda_id):
     """
@@ -189,6 +227,46 @@ def alterar_status_agenda(request, agenda_id):
         'form': form,
         'agenda': agenda
     })
+
+
+@login_required
+def alterar_status_agenda_ajax(request, agenda_id):
+    """
+    Alterar status de um agendamento via AJAX.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Método não permitido'})
+    
+    try:
+        agenda = get_object_or_404(
+            AgendaAula, 
+            id=agenda_id, 
+            aluno__personal_trainer=request.user
+        )
+        
+        import json
+        data = json.loads(request.body)
+        novo_status = data.get('status')
+        
+        # Validar status
+        status_validos = [choice[0] for choice in AgendaAula.STATUS_CHOICES]
+        if novo_status not in status_validos:
+            return JsonResponse({'success': False, 'error': 'Status inválido'})
+        
+        # Atualizar status
+        agenda.status = novo_status
+        agenda.save()
+        
+        return JsonResponse({
+            'success': True, 
+            'message': f'Status alterado para "{agenda.get_status_display()}"',
+            'novo_status': agenda.get_status_display()
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Dados JSON inválidos'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 
 @login_required

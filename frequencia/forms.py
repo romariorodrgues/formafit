@@ -75,6 +75,44 @@ class AgendaAulaForm(forms.ModelForm):
         }
 
 
+class AgendaEditForm(forms.ModelForm):
+    """
+    Formulário para edição de agendamento de aulas (inclui status).
+    """
+    class Meta:
+        model = AgendaAula
+        fields = ['aluno', 'data_aula', 'horario_inicio', 'horario_fim', 'tipo_treino', 'status', 'observacoes']
+        widgets = {
+            'aluno': forms.Select(attrs={
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            }),
+            'data_aula': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            }),
+            'horario_inicio': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            }),
+            'horario_fim': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            }),
+            'tipo_treino': forms.TextInput(attrs={
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                'placeholder': 'Ex: Treino A, Avaliação, Cardio'
+            }),
+            'status': forms.Select(attrs={
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            }),
+            'observacoes': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                'placeholder': 'Observações sobre a aula...'
+            })
+        }
+
+
 class FiltroFrequenciaForm(forms.Form):
     """
     Formulário para filtrar registros de frequência.

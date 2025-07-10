@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ aluno.nome }} - Detalhes{% endblock %}
+
+{% block page_title %}{{ aluno.nome }}{% endblock %}
+{% block page_subtitle %}Informações detalhadas do aluno{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Informações Básicas -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações Pessoais</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nome</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ aluno.nome }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ aluno.email|default:"Não informado" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Telefone</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ aluno.telefone|default:"Não informado" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ aluno.data_nascimento|date:"d/m/Y"|default:"Não informado" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medidas Corporais -->
+            {% if medidas %}
+            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Medidas Corporais Recentes</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Peso</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Altura</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IMC</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for medida in medidas %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ medida.data_medicao|date:"d/m/Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ medida.peso|floatformat:1 }} kg
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ medida.altura|floatformat:2 }} m
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ medida.imc|floatformat:1 }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Estatísticas</h3>
+                
+                <div class="space-y-4">
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <p class="text-sm font-medium text-gray-700">Presenças no Mês</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ presencas_mes }}</p>
+                    </div>
+
+                    {% if plano_atual %}
+                    <div class="border-l-4 border-green-500 pl-4">
+                        <p class="text-sm font-medium text-gray-700">Plano Atual</p>
+                        <p class="text-lg font-semibold text-green-600">{{ plano_atual.nome }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if proximas_aulas %}
+                    <div class="border-l-4 border-yellow-500 pl-4">
+                        <p class="text-sm font-medium text-gray-700">Próximas Aulas</p>
+                        <p class="text-2xl font-bold text-yellow-600">{{ proximas_aulas.count }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Próximas Aulas -->
+            {% if proximas_aulas %}
+            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Próximas Aulas</h3>
+                <div class="space-y-3">
+                    {% for aula in proximas_aulas %}
+                    <div class="border border-gray-200 rounded-lg p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ aula.data_aula|date:"d/m/Y" }}</p>
+                                <p class="text-sm text-gray-600">{{ aula.horario_inicio|time:"H:i" }} - {{ aula.horario_fim|time:"H:i" }}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                {% if aula.status == 'agendado' %}bg-yellow-100 text-yellow-800{% endif %}
+                                {% if aula.status == 'confirmado' %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ aula.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="mt-6 flex justify-end space-x-3">
+        <a href="{% url 'alunos:lista' %}" 
+           class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar
+        </a>
+        <a href="{% url 'alunos:editar' aluno.id %}" 
+           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            <i class="fas fa-edit mr-2"></i>Editar
+        </a>
+    </div>
+</div>
+{% endblock %}

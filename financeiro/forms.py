@@ -205,37 +205,45 @@ class FaturaForm(forms.ModelForm):
         }
         widgets = {
             'aluno': forms.Select(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'placeholder': 'Selecione o aluno...'
             }),
             'mes_referencia': forms.Select(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'placeholder': 'Selecione o mês...'
             }),
             'ano_referencia': forms.NumberInput(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'min': '2020',
                 'max': '2030',
                 'placeholder': 'Ex: 2025'
             }),
             'valor_original': forms.NumberInput(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'step': '0.01',
                 'min': '0',
                 'placeholder': '0.00'
             }),
             'desconto': forms.NumberInput(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'step': '0.01',
                 'min': '0',
                 'value': '0.00',
                 'placeholder': '0.00'
             }),
             'acrescimo': forms.NumberInput(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'step': '0.01',
                 'min': '0',
                 'value': '0.00',
                 'placeholder': '0.00'
             }),
             'data_vencimento': forms.DateInput(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'type': 'date'
             }),
             'observacoes': forms.Textarea(attrs={
+                'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500',
                 'rows': 3,
                 'placeholder': 'Observações sobre a fatura...'
             })
